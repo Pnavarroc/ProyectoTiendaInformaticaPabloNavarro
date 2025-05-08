@@ -1,5 +1,9 @@
 package Modelo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 public class Cliente extends Persona {
     private String contraseña;
     private boolean activo;
@@ -10,39 +14,43 @@ public class Cliente extends Persona {
         this.activo = true;
     }
 
-    //Metodo para Registrarnos
-    public void registrar() {
-        System.out.println("Cliente registrado correctamente: " + getNombre());
-        this.activo = true;
-    }
 
-    // Metodo para iniciar sesion
-    public boolean iniciarSesion(String emailIngresado, String contraseñaIngresada) {
-        if (!activo) {
-            System.out.println("Cuenta desactivada. No se puede iniciar sesión.");
-            return false;
+
+        public void guardarEnBD() {
+            Connection conn = ConexionBD.conectar();
+
+            try {
+                // Insertar en Persona
+                String sqlPersona = "INSERT INTO Persona (id_persona, nombre, email, telefono, direccion) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement psPersona = conn.prepareStatement(sqlPersona);
+                psPersona.setInt(1, getId());
+                psPersona.setString(2, getNombre());
+                psPersona.setString(3, getEmail());
+                psPersona.setString(4, getTelefono());
+                psPersona.setString(5, getDireccion());
+                psPersona.executeUpdate();
+
+                // Insertar en Cliente
+                String sqlCliente = "INSERT INTO Cliente (id_persona) VALUES (?)";
+                PreparedStatement psCliente = conn.prepareStatement(sqlCliente);
+                psCliente.setInt(1, getId());
+                psCliente.executeUpdate();
+
+                System.out.println("Cliente guardado en la base de datos.");
+            } catch (SQLException e) {
+                System.out.println("Error al guardar cliente en la base de datos.");
+                e.printStackTrace();
+            }
+
         }
-
-        if (this.getEmail().equals(emailIngresado) && this.contraseña.equals(contraseñaIngresada)) {
-            System.out.println("Inicio de sesión exitoso.");
-            return true;
-        } else {
-            System.out.println("Credenciales incorrectas.");
-            return false;
-        }
-    }
-
-    // Metodo para darse de baja
-    public void darseDeBaja() {
-        this.activo = false;
-        System.out.println("El cliente " + getNombre() + " ha sido dado de baja.");
-    }
-
-    //MostrarInfo sobreescrito
     @Override
     public void mostrarInfo() {
         super.mostrarInfo();
         System.out.println("Estado de cuenta: " + (activo ? "Activa" : "Inactiva"));
     }
-}
+    }
+
+
+
+
 
