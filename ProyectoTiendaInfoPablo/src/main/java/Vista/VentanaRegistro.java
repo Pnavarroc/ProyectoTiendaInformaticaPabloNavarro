@@ -1,7 +1,6 @@
 package Vista;
 
-
-
+import Controlador.ControladorPersona;
 import Modelo.Cliente;
 import Modelo.Empleado;
 
@@ -9,103 +8,105 @@ import javax.swing.*;
 import java.awt.*;
 
 public class VentanaRegistro extends JFrame {
+
+
     private JTextField txtNombre, txtEmail, txtTelefono, txtDireccion, txtContraseña;
-    private JButton btnCrearCliente, btnCrearEmpleado;
+
+
 
     public VentanaRegistro() {
         setTitle("Registro de Personas");
-        setSize(400, 300);
+        setSize(500, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centra la ventana
+        setLocationRelativeTo(null);
 
-        // Crear panel y layout
-        JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
+        JTabbedPane pestañas = new JTabbedPane();
+        pestañas.add("Cliente", panelCliente());
+        pestañas.add("Empleado", panelEmpleado());
 
-        // Componentes
-        panel.add(new JLabel("Nombre:"));
-        txtNombre = new JTextField();
-        panel.add(txtNombre);
+        add(pestañas);
 
-        panel.add(new JLabel("Email:"));
-        txtEmail = new JTextField();
-        panel.add(txtEmail);
-
-        panel.add(new JLabel("Teléfono:"));
-        txtTelefono = new JTextField();
-        panel.add(txtTelefono);
-
-        panel.add(new JLabel("Dirección:"));
-        txtDireccion = new JTextField();
-        panel.add(txtDireccion);
-
-        panel.add(new JLabel("Contraseña (solo cliente):"));
-        txtContraseña = new JTextField();
-        panel.add(txtContraseña);
-
-        // Botones
-        btnCrearCliente = new JButton("Crear Cliente");
-        btnCrearEmpleado = new JButton("Crear Empleado");
-        panel.add(btnCrearCliente);
-        panel.add(btnCrearEmpleado);
-
-        add(panel); // Agregar panel a la ventana
-
-        // Acción: Crear Cliente
-        btnCrearCliente.addActionListener(e -> {
-            try {
-                Cliente cliente = new Cliente(
-                        generarID(), // Temporal, puedes reemplazar por auto-incremento real
-                        txtNombre.getText(),
-                        txtEmail.getText(),
-                        txtTelefono.getText(),
-                        txtDireccion.getText(),
-                        txtContraseña.getText()
-                );
-                cliente.guardarEnBD();
-                JOptionPane.showMessageDialog(this, "Cliente guardado en la base de datos.");
-                limpiarCampos();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al guardar cliente: " + ex.getMessage());
-            }
-        });
-
-        // Acción: Crear Empleado
-        btnCrearEmpleado.addActionListener(e -> {
-            try {
-                Empleado empleado = new Empleado(
-                        generarID(),
-                        txtNombre.getText(),
-                        txtEmail.getText(),
-                        txtTelefono.getText(),
-                        txtDireccion.getText()
-                );
-                empleado.guardarEnBD();
-                JOptionPane.showMessageDialog(this, "Empleado guardado en la base de datos.");
-                limpiarCampos();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al guardar empleado: " + ex.getMessage());
-            }
-        });
     }
 
-    // Método auxiliar para limpiar campos del formulario
+    private JPanel panelCliente() {
+        JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
+
+        txtNombre = new JTextField();
+        txtEmail = new JTextField();
+        txtTelefono = new JTextField();
+        txtDireccion = new JTextField();
+        txtContraseña = new JTextField();
+
+        panel.add(new JLabel("Nombre:")); panel.add(txtNombre);
+        panel.add(new JLabel("Email:")); panel.add(txtEmail);
+        panel.add(new JLabel("Teléfono:")); panel.add(txtTelefono);
+        panel.add(new JLabel("Dirección:")); panel.add(txtDireccion);
+        panel.add(new JLabel("Contraseña:")); panel.add(txtContraseña);
+
+        JButton btnRegistrar = new JButton("Registrar Cliente");
+        panel.add(btnRegistrar);
+
+        btnRegistrar.addActionListener(e -> {
+            Cliente cliente = new Cliente(
+                    txtNombre.getText(),
+                    txtEmail.getText(),
+                    txtTelefono.getText(),
+                    txtDireccion.getText(),
+                    txtContraseña.getText()
+            );
+
+            new ControladorPersona().registrarPersona(cliente);
+            JOptionPane.showMessageDialog(this, "Cliente registrado correctamente.");
+            limpiarCampos();
+        });
+
+        return panel;
+    }
+
+    private JPanel panelEmpleado() {
+        JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5));
+
+        txtNombre = new JTextField();
+        txtEmail = new JTextField();
+        txtTelefono = new JTextField();
+        txtDireccion = new JTextField();
+
+        panel.add(new JLabel("Nombre:")); panel.add(txtNombre);
+        panel.add(new JLabel("Email:")); panel.add(txtEmail);
+        panel.add(new JLabel("Teléfono:")); panel.add(txtTelefono);
+        panel.add(new JLabel("Dirección:")); panel.add(txtDireccion);
+
+        JButton btnRegistrar = new JButton("Registrar Empleado");
+        panel.add(btnRegistrar);
+
+        btnRegistrar.addActionListener(e -> {
+            Empleado empleado = new Empleado(
+                    txtNombre.getText(),
+                    txtEmail.getText(),
+                    txtTelefono.getText(),
+                    txtDireccion.getText()
+            );
+
+            new ControladorPersona().registrarPersona(empleado);
+            JOptionPane.showMessageDialog(this, "Empleado registrado correctamente.");
+            limpiarCampos();
+        });
+
+        return panel;
+    }
+
     private void limpiarCampos() {
         txtNombre.setText("");
         txtEmail.setText("");
         txtTelefono.setText("");
         txtDireccion.setText("");
-        txtContraseña.setText("");
+        if (txtContraseña != null) {
+            txtContraseña.setText("");
+        }
     }
 
-    // Método temporal para generar ID (solo para pruebas sin auto_increment)
-    private int generarID() {
-        return (int) (Math.random() * 10000); // ⚠️ Reemplaza por lógica real si usas AUTO_INCREMENT
-    }
-
-    // Main para ejecutar la ventana
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new VentanaRegistro().setVisible(true);
-        });
+
+        SwingUtilities.invokeLater(() -> new VentanaRegistro().setVisible(true));
     }
 }

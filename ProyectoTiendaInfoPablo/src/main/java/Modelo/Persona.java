@@ -1,7 +1,7 @@
 package Modelo;
 
 public abstract class Persona {
-    private int id;
+    private int id=0;
     private String nombre;
     private String email;
     private String telefono;
@@ -10,8 +10,8 @@ public abstract class Persona {
     public Persona() {
     }
 
-    public Persona(int id, String nombre, String email, String telefono, String direccion) {
-        this.id = id;
+    public Persona(String nombre, String email, String telefono, String direccion) {
+
         this.nombre = nombre;
         this.email = email;
         this.telefono = telefono;
@@ -22,6 +22,7 @@ public abstract class Persona {
     public int getId() {
         return id;
     }
+
 
     public String getNombre() {
         return nombre;
@@ -39,6 +40,10 @@ public abstract class Persona {
         return direccion;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -54,6 +59,7 @@ public abstract class Persona {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
+    public abstract void guardarEnBD();
 
     public void mostrarInfo() {
         System.out.println("ID: " + id);
