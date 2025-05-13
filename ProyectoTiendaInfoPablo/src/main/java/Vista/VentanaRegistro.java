@@ -47,6 +47,12 @@ public class VentanaRegistro extends JFrame {
         panel.add(btnRegistrar);
 
         btnRegistrar.addActionListener(e -> {
+
+            if (txtEmail.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El email no puede estar vacío.");
+                return;
+            }
+
             Cliente cliente = new Cliente(
                     txtNombre.getText(),
                     txtEmail.getText(),
