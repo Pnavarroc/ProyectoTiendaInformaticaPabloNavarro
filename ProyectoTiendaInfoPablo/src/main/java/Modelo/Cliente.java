@@ -14,6 +14,9 @@ public class Cliente extends Persona {
         this.activo = true;
     }
 
+    public Cliente() {
+    }
+
     @Override
     public void guardarEnBD() {
         try {

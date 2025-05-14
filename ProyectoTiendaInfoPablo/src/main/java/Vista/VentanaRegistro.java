@@ -10,7 +10,8 @@ import java.awt.*;
 public class VentanaRegistro extends JFrame {
 
 
-    private JTextField txtNombre, txtEmail, txtTelefono, txtDireccion, txtContraseña;
+    private JTextField txtNombre, txtEmail, txtTelefono, txtDireccion;
+    private JPasswordField txtContraseña;
 
 
 
@@ -35,7 +36,7 @@ public class VentanaRegistro extends JFrame {
         txtEmail = new JTextField();
         txtTelefono = new JTextField();
         txtDireccion = new JTextField();
-        txtContraseña = new JTextField();
+        txtContraseña = new JPasswordField();
 
         panel.add(new JLabel("Nombre:")); panel.add(txtNombre);
         panel.add(new JLabel("Email:")); panel.add(txtEmail);
@@ -90,7 +91,9 @@ public class VentanaRegistro extends JFrame {
                     txtNombre.getText(),
                     txtEmail.getText(),
                     txtTelefono.getText(),
-                    txtDireccion.getText()
+                    txtDireccion.getText(),
+                    new String(txtContraseña.getPassword()).trim()
+
             );
 
             new ControladorPersona().registrarPersona(empleado);
@@ -109,6 +112,13 @@ public class VentanaRegistro extends JFrame {
         if (txtContraseña != null) {
             txtContraseña.setText("");
         }
+    }
+    private boolean camposVacios() {
+        return txtNombre.getText().trim().isEmpty() ||
+                txtEmail.getText().trim().isEmpty() ||
+                txtTelefono.getText().trim().isEmpty() ||
+                txtDireccion.getText().trim().isEmpty() ||
+                txtContraseña.getPassword().length == 0;
     }
 
     public static void main(String[] args) {

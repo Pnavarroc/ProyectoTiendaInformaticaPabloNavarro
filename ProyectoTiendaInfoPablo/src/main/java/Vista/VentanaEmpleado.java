@@ -1,51 +1,36 @@
 package Vista;
 
-import Modelo.Empleado;
-import Modelo.EmpleadoDAO;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class VentanaEmpleado extends JFrame {
 
-    private JTextField txtId;
-
     public VentanaEmpleado() {
-        setTitle("Iniciar Sesión - Empleado");
-        setSize(350, 150);
+        setTitle("Empleado - Tienda Informática");
+        setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(2, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
 
-        txtId = new JTextField();
+        JLabel lblTitulo = new JLabel("¿Qué deseas hacer?", JLabel.CENTER);
+        JButton btnIniciarSesion = new JButton("Iniciar Sesión");
+        JButton btnRegistrar = new JButton("Registrarse como Empleado");
 
-        panel.add(new JLabel("ID Empleado:"));
-        panel.add(txtId);
-
-        JButton btnIniciar = new JButton("Iniciar Sesión");
-        panel.add(btnIniciar);
+        panel.add(lblTitulo);
+        panel.add(btnIniciarSesion);
+        panel.add(btnRegistrar);
 
         add(panel);
 
-        btnIniciar.addActionListener(e -> {
-            try {
-                int id = Integer.parseInt(txtId.getText().trim());
+        btnIniciarSesion.addActionListener(e -> {
+            new VentanaLoginCliente().setVisible(true);
+            dispose();
+        });
 
-                Empleado empleado = EmpleadoDAO.buscarEmpleadoPorId(id);
-
-                if (empleado != null) {
-                    JOptionPane.showMessageDialog(this, "Bienvenido, " + empleado.getNombre());
-                    dispose();
-                    new VentanaEmpleadoMenu(empleado).setVisible(true); // ⬅️ Abre menú
-                } else {
-                    JOptionPane.showMessageDialog(this, "Empleado no encontrado.");
-                }
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "ID debe ser un número válido.");
-            }
+        btnRegistrar.addActionListener(e -> {
+            new VentanaRegistroEmpleado().setVisible(true);
+            dispose();
         });
     }
 }
-

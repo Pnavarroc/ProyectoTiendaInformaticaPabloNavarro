@@ -7,33 +7,37 @@ public class VentanaInicio extends JFrame {
 
     public VentanaInicio() {
         setTitle("Bienvenido a Tienda Informática");
-        setSize(400, 200);
+        setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Panel y Layout
-        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
-        JLabel lblPregunta = new JLabel("¿Eres Cliente o Empleado?", JLabel.CENTER);
+        JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
+
+        JLabel lblTitulo = new JLabel("¿Cómo deseas acceder?", JLabel.CENTER);
         JButton btnCliente = new JButton("Cliente");
         JButton btnEmpleado = new JButton("Empleado");
 
-        // Añadir al panel
-        panel.add(lblPregunta);
+
+        panel.add(lblTitulo);
         panel.add(btnCliente);
         panel.add(btnEmpleado);
 
+
         add(panel);
 
-        // Acciones
+        // Acción: acceder como cliente
         btnCliente.addActionListener(e -> {
             new VentanaCliente().setVisible(true);
-            dispose(); // cerrar esta ventana
+            dispose();
         });
 
+        // Acción: acceder como empleado
         btnEmpleado.addActionListener(e -> {
-            new VentanaEmpleado().setVisible(true);
-            dispose(); // cerrar esta ventana
+            new Vista.VentanaEmpleado().setVisible(true);
+            dispose();
         });
+
+       
     }
 
     public static void main(String[] args) {
