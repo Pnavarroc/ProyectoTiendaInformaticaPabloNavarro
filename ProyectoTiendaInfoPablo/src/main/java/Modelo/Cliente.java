@@ -17,21 +17,30 @@ public class Cliente extends Persona {
     public Cliente() {
     }
 
+    public String getContraseña() {
+        return contraseña;
+    }
+
     @Override
     public void guardarEnBD() {
         try {
-            PersonaDAO.guardarPersona(this); // PersonaDAO le asigna el ID con setId()
+            // Insertar en Persona
+            int idGenerado = PersonaDAO.guardarPersona(this);
+            this.setId(idGenerado);
 
+            // Insertar en Cliente con contraseña
             Connection conn = ConexionBD.conectar();
-            String sql = "INSERT INTO Cliente (id_persona) VALUES (?)";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, getId());
+            String sqlCliente = "INSERT INTO Cliente (id_persona, contraseña) VALUES (?, ?)";
+            PreparedStatement ps = conn.prepareStatement(sqlCliente);
+            ps.setInt(1, this.getId());
+            ps.setString(2, contraseña);
             ps.executeUpdate();
+
         } catch (SQLException e) {
+            System.out.println("Error al guardar cliente en la base de datos.");
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void mostrarInfo() {

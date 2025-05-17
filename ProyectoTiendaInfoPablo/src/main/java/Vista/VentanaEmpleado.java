@@ -6,31 +6,24 @@ import java.awt.*;
 public class VentanaEmpleado extends JFrame {
 
     public VentanaEmpleado() {
-        setTitle("Empleado - Tienda Informática");
-        setSize(400, 200);
+        setTitle("Empleado - Iniciar Sesión");
+        setSize(350, 150);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
 
-        JLabel lblTitulo = new JLabel("¿Qué deseas hacer?", JLabel.CENTER);
-        JButton btnIniciarSesion = new JButton("Iniciar Sesión");
-        JButton btnRegistrar = new JButton("Registrarse como Empleado");
+        JLabel lblTitulo = new JLabel("Bienvenido, empleado", JLabel.CENTER);
+        JButton btnLogin = new JButton("Iniciar Sesión");
 
         panel.add(lblTitulo);
-        panel.add(btnIniciarSesion);
-        panel.add(btnRegistrar);
+        panel.add(btnLogin);
 
         add(panel);
 
-        btnIniciarSesion.addActionListener(e -> {
-            new VentanaLoginCliente().setVisible(true);
+        btnLogin.addActionListener(e -> {
             dispose();
-        });
-
-        btnRegistrar.addActionListener(e -> {
-            new VentanaRegistroEmpleado().setVisible(true);
-            dispose();
+            new VentanaLoginEmpleado().setVisible(true);
         });
     }
 }

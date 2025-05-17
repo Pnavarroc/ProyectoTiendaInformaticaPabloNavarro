@@ -1,8 +1,9 @@
 package Modelo;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.*;
 
 public class CompraDAO {
 
@@ -45,5 +46,88 @@ public class CompraDAO {
         }
 
         ps.executeBatch();
+    }
+
+    public static List<Compra> obtenerComprasPorCliente(int idCliente) {
+        List<Compra> lista = new ArrayList<>();
+        Connection conn = ConexionBD.conectar();
+
+        try {
+            String sql = "SELECT id_compra, id_empleado, total FROM Compra WHERE id_cliente = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idCliente);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int idCompra = rs.getInt("id_compra");
+                int idEmpleado = rs.getInt("id_empleado");
+                double total = rs.getDouble("total");
+
+                Compra compra = new Compra(null, null, total, null);
+                compra.setId(idCompra);
+                lista.add(compra);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
+
+    public static Map<String, Double> obtenerClientesAtendidos(int idEmpleado) {
+        Map<String, Double> resultado = new HashMap<>();
+        Connection conn = ConexionBD.conectar();
+
+        try {
+            String sql = """
+            SELECT p.nombre, SUM(c.total) as total_gastado
+            FROM Compra c
+            JOIN Persona p ON c.id_cliente = p.id_persona
+            WHERE c.id_empleado = ?
+            GROUP BY p.nombre
+        """;
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idEmpleado);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                resultado.put(rs.getString("nombre"), rs.getDouble("total_gastado"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return resultado;
+    }
+
+    public static Map<String, Integer> obtenerProductosPorCompra(int idCompra) {
+        Map<String, Integer> productos = new LinkedHashMap<>();
+        Connection conn = ConexionBD.conectar();
+
+        try {
+            String sql = """
+            SELECT pr.nombre, COUNT(*) as cantidad
+            FROM Contiene c
+            JOIN Producto pr ON c.id_producto = pr.id_producto
+            WHERE c.id_compra = ?
+            GROUP BY pr.nombre
+        """;
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idCompra);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                productos.put(rs.getString("nombre"), rs.getInt("cantidad"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return productos;
     }
 }

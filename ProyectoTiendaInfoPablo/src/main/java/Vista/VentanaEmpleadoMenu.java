@@ -22,12 +22,20 @@ public class VentanaEmpleadoMenu extends JFrame {
         JLabel lblBienvenida = new JLabel("Bienvenido, " + empleado.getNombre(), JLabel.CENTER);
         JButton btnVerDatos = new JButton("Ver mis datos");
         JButton btnCerrarSesion = new JButton("Cerrar sesión");
+        JButton btnInforme = new JButton("Clientes Atendidos");
 
         panel.add(lblBienvenida);
         panel.add(btnVerDatos);
         panel.add(btnCerrarSesion);
 
         add(panel);
+
+
+        btnInforme.addActionListener(e -> {
+            new VentanaInformeEmpleado(empleado).setVisible(true);
+        });
+
+        panel.add(btnInforme);
 
         // Mostrar información personal
         btnVerDatos.addActionListener(e -> {

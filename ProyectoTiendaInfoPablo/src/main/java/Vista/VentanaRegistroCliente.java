@@ -1,14 +1,15 @@
 package Vista;
 
-import Controlador.ControladorPersona;
 import Modelo.Cliente;
-
+import Controlador.ControladorPersona;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class VentanaRegistroCliente extends JFrame {
-    private JTextField txtNombre, txtEmail, txtTelefono, txtDireccion, txtContraseña;
+
+    private JTextField txtNombre, txtEmail, txtTelefono, txtDireccion;
+    private JPasswordField txtContraseña;
 
     public VentanaRegistroCliente() {
         setTitle("Registro de Cliente");
@@ -16,14 +17,13 @@ public class VentanaRegistroCliente extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Layout
         JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
 
         txtNombre = new JTextField();
         txtEmail = new JTextField();
         txtTelefono = new JTextField();
         txtDireccion = new JTextField();
-        txtContraseña = new JTextField();
+        txtContraseña = new JPasswordField();
 
         panel.add(new JLabel("Nombre:"));     panel.add(txtNombre);
         panel.add(new JLabel("Email:"));      panel.add(txtEmail);
@@ -48,7 +48,7 @@ public class VentanaRegistroCliente extends JFrame {
                     txtEmail.getText().trim(),
                     txtTelefono.getText().trim(),
                     txtDireccion.getText().trim(),
-                    txtContraseña.getText().trim()
+                    new String(txtContraseña.getPassword()).trim()
             );
 
             new ControladorPersona().registrarPersona(cliente);
@@ -62,7 +62,7 @@ public class VentanaRegistroCliente extends JFrame {
                 txtEmail.getText().trim().isEmpty() ||
                 txtTelefono.getText().trim().isEmpty() ||
                 txtDireccion.getText().trim().isEmpty() ||
-                txtContraseña.getText().trim().isEmpty();
+                txtContraseña.getPassword().length == 0;
     }
 
     private void volverAlMenuCliente() {
