@@ -19,7 +19,7 @@ public class VentanaCompraCliente extends JFrame {
         this.cliente = cliente;
 
         setTitle("Realizar Compra - Cliente: " + cliente.getNombre());
-        setSize(700, 400);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

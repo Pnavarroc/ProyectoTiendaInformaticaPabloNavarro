@@ -13,7 +13,7 @@ public class VentanaLoginCliente extends JFrame {
 
     public VentanaLoginCliente() {
         setTitle("Iniciar Sesión - Cliente");
-        setSize(350, 200);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

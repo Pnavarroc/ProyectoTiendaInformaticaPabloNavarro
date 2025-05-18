@@ -7,7 +7,7 @@ public class VentanaCliente extends JFrame {
 
     public VentanaCliente() {
         setTitle("Cliente - Tienda Informática");
-        setSize(400, 200);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

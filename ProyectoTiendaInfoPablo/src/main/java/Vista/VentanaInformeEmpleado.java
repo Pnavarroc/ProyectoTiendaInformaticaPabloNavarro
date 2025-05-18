@@ -11,7 +11,7 @@ public class VentanaInformeEmpleado extends JFrame {
 
     public VentanaInformeEmpleado(Empleado empleado) {
         setTitle("Clientes atendidos por: " + empleado.getNombre());
-        setSize(400, 300);
+        setSize(900, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

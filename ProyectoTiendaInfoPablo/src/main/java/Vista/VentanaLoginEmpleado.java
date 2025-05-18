@@ -13,7 +13,7 @@ public class VentanaLoginEmpleado extends JFrame {
 
     public VentanaLoginEmpleado() {
         setTitle("Iniciar Sesión - Empleado");
-        setSize(350, 200);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

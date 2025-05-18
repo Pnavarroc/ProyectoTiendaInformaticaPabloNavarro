@@ -10,7 +10,7 @@ public class VentanaDetalleCompra extends JFrame {
 
     public VentanaDetalleCompra(int idCompra) {
         setTitle("Detalle de la Compra #" + idCompra);
-        setSize(400, 300);
+        setSize(900, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

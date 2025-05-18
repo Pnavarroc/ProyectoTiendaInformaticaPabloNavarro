@@ -13,7 +13,7 @@ public class VentanaEmpleadoMenu extends JFrame {
         this.empleado = empleado;
 
         setTitle("Panel de Empleado");
-        setSize(400, 200);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

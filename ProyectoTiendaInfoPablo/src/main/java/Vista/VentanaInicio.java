@@ -7,7 +7,7 @@ public class VentanaInicio extends JFrame {
 
     public VentanaInicio() {
         setTitle("Bienvenido a Tienda Informática");
-        setSize(400, 250);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

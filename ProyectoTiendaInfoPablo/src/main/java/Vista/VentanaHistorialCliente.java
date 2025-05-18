@@ -12,7 +12,7 @@ public class VentanaHistorialCliente extends JFrame {
 
     public VentanaHistorialCliente(Cliente cliente) {
         setTitle("Historial de Compras - " + cliente.getNombre());
-        setSize(400, 400);
+        setSize(900, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

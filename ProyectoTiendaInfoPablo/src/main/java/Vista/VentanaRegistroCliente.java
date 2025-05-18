@@ -13,7 +13,7 @@ public class VentanaRegistroCliente extends JFrame {
 
     public VentanaRegistroCliente() {
         setTitle("Registro de Cliente");
-        setSize(400, 300);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

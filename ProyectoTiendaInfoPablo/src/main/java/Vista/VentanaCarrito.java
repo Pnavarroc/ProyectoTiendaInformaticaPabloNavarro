@@ -17,7 +17,7 @@ public class VentanaCarrito extends JFrame {
     double total =0;
     public VentanaCarrito(Cliente cliente, Map<Producto, Integer> carrito) {
         setTitle("Carrito de Compra");
-        setSize(500, 400);
+        setSize(900, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
