@@ -6,34 +6,35 @@ import java.awt.*;
 public class VentanaCliente extends JFrame {
 
     public VentanaCliente() {
-        setTitle("Cliente - Tienda Informática");
+        setTitle("Área Cliente");
         setSize(900, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        // Layout vertical
-        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
+        // 🔙 Botón Volver en la parte superior izquierda
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelSuperior.add(new BotonVolver(new VentanaInicio()));
+        add(panelSuperior, BorderLayout.NORTH);
 
-        JLabel lblTitulo = new JLabel("¿Qué deseas hacer?", JLabel.CENTER);
-        JButton btnIniciarSesion = new JButton("Iniciar Sesión");
-        JButton btnRegistrarse = new JButton("Registrarse");
+        // ▶️ Contenido principal centrado
+        JPanel centro = new JPanel(new GridLayout(2, 1, 10, 10));
+        JButton btnIniciar = new JButton("Iniciar sesión");
+        JButton btnRegistrar = new JButton("Registrarse");
 
-        panel.add(lblTitulo);
-        panel.add(btnIniciarSesion);
-        panel.add(btnRegistrarse);
-
-        add(panel);
-
-        // Acción: Iniciar sesión
-        btnIniciarSesion.addActionListener(e -> {
+        btnIniciar.addActionListener(e -> {
+            dispose();
             new VentanaLoginCliente().setVisible(true);
-            dispose();
         });
 
-        // Acción: Registrarse
-        btnRegistrarse.addActionListener(e -> {
-            new VentanaRegistroCliente().setVisible(true);
+        btnRegistrar.addActionListener(e -> {
             dispose();
+            new VentanaRegistroCliente().setVisible(true);
         });
+
+        centro.add(btnIniciar);
+        centro.add(btnRegistrar);
+        add(centro, BorderLayout.CENTER);
     }
 }
+

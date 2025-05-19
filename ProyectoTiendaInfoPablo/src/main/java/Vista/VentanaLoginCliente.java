@@ -17,11 +17,15 @@ public class VentanaLoginCliente extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
 
+        // 🔙 Botón Volver en la parte superior izquierda
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelSuperior.add(new BotonVolver(new VentanaInicio()));
+        add(panelSuperior, BorderLayout.NORTH);
+
+        JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
         txtId = new JTextField();
         txtContraseña = new JPasswordField();
-
         panel.add(new JLabel("ID Cliente:"));
         panel.add(txtId);
 

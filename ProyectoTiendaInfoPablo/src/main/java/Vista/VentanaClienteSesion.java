@@ -23,8 +23,12 @@ public class VentanaClienteSesion extends JFrame {
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
         setLayout(new BorderLayout());
+
+        // 🔙 Botón Volver en la parte superior izquierda
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelSuperior.add(new BotonVolver(new VentanaInicio()));
+        add(panelSuperior, BorderLayout.NORTH);
 
         // Panel productos (centro)
         JPanel panelProductos = new JPanel();
@@ -74,18 +78,12 @@ public class VentanaClienteSesion extends JFrame {
 
         add(panelInferior, BorderLayout.SOUTH);
 
-        // Botón carrito (derecha)
-        JButton btnCarrito = new JButton("🛒 Ver carrito / Comprar");
-        btnCarrito.addActionListener(e -> {
-            new VentanaCarrito(cliente, carrito).setVisible(true);
-            dispose();
-        });
 
-        JPanel panelDerecha = new JPanel(new BorderLayout());
-        panelDerecha.add(btnCarrito, BorderLayout.NORTH);
-        add(panelDerecha, BorderLayout.EAST);
 
         // Acciones
+
+
+
         btnHistorial.addActionListener(e -> new VentanaHistorialCliente(cliente).setVisible(true));
 
         btnCerrar.addActionListener(e -> {

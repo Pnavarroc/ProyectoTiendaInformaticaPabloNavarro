@@ -11,6 +11,12 @@ public class VentanaEmpleado extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // 🔙 Botón Volver en la parte superior izquierda
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelSuperior.add(new BotonVolver(new VentanaInicio()));
+        add(panelSuperior, BorderLayout.NORTH);
+
+
         JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
 
         JLabel lblTitulo = new JLabel("Bienvenido, empleado", JLabel.CENTER);

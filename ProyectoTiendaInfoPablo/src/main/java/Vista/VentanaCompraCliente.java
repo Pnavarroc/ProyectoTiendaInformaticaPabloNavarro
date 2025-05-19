@@ -1,102 +1,167 @@
 package Vista;
 
 import Modelo.*;
-
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.List;
 
 public class VentanaCompraCliente extends JFrame {
 
     private Cliente cliente;
-    private JTable tablaProductos;
-    private DefaultTableModel modeloTabla;
+    private Map<Producto, Integer> carrito = new LinkedHashMap<>();
+    private JPanel panelCarrito;
+    private JLabel lblTotal;
 
     public VentanaCompraCliente(Cliente cliente) {
         this.cliente = cliente;
 
-        setTitle("Realizar Compra - Cliente: " + cliente.getNombre());
-        setSize(900, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Compra - " + cliente.getNombre());
+        setSize(1000, 600);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout(10, 10));
 
-        String[] columnas = {"ID", "Nombre", "Marca", "Precio (€)", "Cantidad"};
-        modeloTabla = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return column == 4;
-            }
+        // 🔙 Panel superior con botón volver
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelSuperior.add(new BotonVolver(new VentanaClienteSesion(cliente)));
+        add(panelSuperior, BorderLayout.NORTH);
 
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                return columnIndex == 4 ? Integer.class : String.class;
-            }
-        };
+        // 🟩 Panel de productos disponibles (izquierda)
+        JPanel panelProductos = new JPanel();
+        panelProductos.setLayout(new BoxLayout(panelProductos, BoxLayout.Y_AXIS));
+        JScrollPane scrollProductos = new JScrollPane(panelProductos);
+        scrollProductos.setBorder(BorderFactory.createTitledBorder("Productos"));
 
-        tablaProductos = new JTable(modeloTabla);
-        JScrollPane scroll = new JScrollPane(tablaProductos);
-        cargarProductos();
+        for (Producto p : ProductoDAO.getTodosLosProductos()) {
+            JPanel card = new JPanel(new BorderLayout());
+            card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+            JTextArea info = new JTextArea(
+                    p.getNombre() + "\n" +
+                            "Marca: " + p.getMarca() + "\n" +
+                            "Precio: " + p.getPrecio() + "€"
+            );
+            info.setEditable(false);
 
-        JButton btnComprar = new JButton("Realizar compra");
-        btnComprar.addActionListener(e -> realizarCompra());
-
-        add(scroll, BorderLayout.CENTER);
-        add(btnComprar, BorderLayout.SOUTH);
-    }
-
-    private void cargarProductos() {
-        List<Producto> productos = ProductoDAO.getTodosLosProductos();
-        for (Producto p : productos) {
-            modeloTabla.addRow(new Object[]{
-                    p.getId(), p.getNombre(), p.getMarca(), p.getPrecio(), 0
+            JButton btnAdd = new JButton("Añadir al carrito");
+            btnAdd.addActionListener(e -> {
+                carrito.put(p, carrito.getOrDefault(p, 0) + 1);
+                actualizarCarrito();
             });
-        }
-    }
 
-    private void realizarCompra() {
-        Map<Producto, Integer> carrito = new HashMap<>();
-        double total = 0;
-
-        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-            int cantidad = (int) modeloTabla.getValueAt(i, 4);
-            if (cantidad > 0) {
-                Producto p = new Producto(
-                        (int) modeloTabla.getValueAt(i, 0),
-                        (String) modeloTabla.getValueAt(i, 1),
-                        (String) modeloTabla.getValueAt(i, 2),
-                        (double) modeloTabla.getValueAt(i, 3)
-                );
-                carrito.put(p, cantidad);
-                total += cantidad * p.getPrecio();
-            }
+            card.add(info, BorderLayout.CENTER);
+            card.add(btnAdd, BorderLayout.SOUTH);
+            panelProductos.add(card);
         }
 
-        if (carrito.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No has seleccionado ningún producto.");
-            return;
-        }
+        add(scrollProductos, BorderLayout.WEST);
 
-        try {
-            Empleado empleado = EmpleadoDAO.obtenerEmpleadoAleatorio();
-            if (empleado == null) {
-                JOptionPane.showMessageDialog(this, "No hay empleados disponibles para gestionar la compra.");
+        // 🟦 Panel del carrito (derecha)
+        panelCarrito = new JPanel();
+        panelCarrito.setLayout(new BoxLayout(panelCarrito, BoxLayout.Y_AXIS));
+        JScrollPane scrollCarrito = new JScrollPane(panelCarrito);
+        scrollCarrito.setBorder(BorderFactory.createTitledBorder("Carrito"));
+        scrollCarrito.setPreferredSize(new Dimension(400, 0));
+        add(scrollCarrito, BorderLayout.EAST);
+
+        // 🟨 Panel inferior (total + botones)
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        lblTotal = new JLabel("Total: 0.00€");
+
+        JButton btnVaciar = new JButton("Vaciar carrito");
+        btnVaciar.addActionListener(e -> {
+            carrito.clear();
+            actualizarCarrito();
+        });
+
+        JButton btnComprar = new JButton("✅ Realizar compra");
+        btnComprar.addActionListener(e -> {
+            if (carrito.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El carrito está vacío.");
                 return;
             }
 
-            Compra compra = new Compra(cliente, empleado, total, carrito);
-            CompraDAO.guardarCompra(compra);
-            CompraDAO.guardarProductosComprados(compra);
+            int confirm = JOptionPane.showConfirmDialog(this, "¿Deseas confirmar la compra?", "Confirmación", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    double total = calcularTotal();
+                    Empleado emp = EmpleadoDAO.obtenerEmpleadoAleatorio();
+                    if (emp == null) {
+                        JOptionPane.showMessageDialog(this, "No hay empleados disponibles.");
+                        return;
+                    }
+                    Compra compra = new Compra(cliente, emp, total, carrito);
+                    CompraDAO.guardarCompra(compra);
+                    CompraDAO.guardarProductosComprados(compra);
 
-            JOptionPane.showMessageDialog(this, "Compra realizada con éxito. Total: " + total + "€");
-            dispose();
-            new VentanaClienteSesion(cliente).setVisible(true);
+                    JOptionPane.showMessageDialog(this, "¡Compra realizada con éxito!");
+                    carrito.clear();
+                    actualizarCarrito();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al guardar la compra.");
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error al procesar la compra.");
+                }
+            }
+        });
+
+        panelInferior.add(lblTotal);
+        panelInferior.add(btnVaciar);
+        panelInferior.add(btnComprar);
+        add(panelInferior, BorderLayout.SOUTH);
+
+        actualizarCarrito();
+    }
+
+    private void actualizarCarrito() {
+        panelCarrito.removeAll();
+
+        for (Producto p : carrito.keySet()) {
+            int cantidad = carrito.get(p);
+
+            JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JLabel lbl = new JLabel(p.getNombre() + " x" + cantidad);
+
+            JButton btnMas = new JButton("+");
+            btnMas.addActionListener(e -> {
+                carrito.put(p, cantidad + 1);
+                actualizarCarrito();
+            });
+
+            JButton btnMenos = new JButton("-");
+            btnMenos.addActionListener(e -> {
+                if (cantidad > 1) {
+                    carrito.put(p, cantidad - 1);
+                } else {
+                    carrito.remove(p);
+                }
+                actualizarCarrito();
+            });
+
+            JButton btnEliminar = new JButton("❌");
+            btnEliminar.addActionListener(e -> {
+                carrito.remove(p);
+                actualizarCarrito();
+            });
+
+            item.add(lbl);
+            item.add(btnMas);
+            item.add(btnMenos);
+            item.add(btnEliminar);
+            panelCarrito.add(item);
         }
+
+        lblTotal.setText("Total: " + String.format("%.2f", calcularTotal()) + "€");
+
+        panelCarrito.revalidate();
+        panelCarrito.repaint();
+    }
+
+    private double calcularTotal() {
+        double total = 0;
+        for (Map.Entry<Producto, Integer> entry : carrito.entrySet()) {
+            total += entry.getKey().getPrecio() * entry.getValue();
+        }
+        return total;
     }
 }

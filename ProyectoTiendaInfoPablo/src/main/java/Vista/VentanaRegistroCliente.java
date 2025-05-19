@@ -17,6 +17,11 @@ public class VentanaRegistroCliente extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // 🔙 Botón Volver en la parte superior izquierda
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelSuperior.add(new BotonVolver(new VentanaInicio()));
+        add(panelSuperior, BorderLayout.NORTH);
+
         JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
 
         txtNombre = new JTextField();
@@ -52,7 +57,7 @@ public class VentanaRegistroCliente extends JFrame {
             );
 
             new ControladorPersona().registrarPersona(cliente);
-            JOptionPane.showMessageDialog(this, "¡Cliente registrado con éxito!");
+            JOptionPane.showMessageDialog(this, "¡Cliente registrado con éxito!" +" Recuerde su Id: "+ cliente.getId());
             volverAlMenuCliente();
         });
     }
