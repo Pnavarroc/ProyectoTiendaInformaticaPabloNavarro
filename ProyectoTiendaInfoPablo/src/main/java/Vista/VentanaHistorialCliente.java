@@ -5,7 +5,6 @@ import Modelo.CompraDAO;
 import Modelo.Cliente;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 public class VentanaHistorialCliente extends JFrame {
@@ -29,7 +28,7 @@ public class VentanaHistorialCliente extends JFrame {
         } else {
             for (Compra c : compras) {
                 JButton btn = new JButton("Ver detalles de Compra #" + c.getId() + " | Total: " + c.getTotal() + "€");
-                btn.addActionListener(e -> new VentanaDetalleCompra(c.getId()).setVisible(true));
+                btn.addActionListener(e -> new VentanaContiene(c.getId()).setVisible(true));
                 panel.add(btn);
             }
         }

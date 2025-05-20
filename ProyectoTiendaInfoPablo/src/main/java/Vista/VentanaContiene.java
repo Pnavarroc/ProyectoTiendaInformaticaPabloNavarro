@@ -3,12 +3,11 @@ package Vista;
 import Modelo.CompraDAO;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Map;
 
-public class VentanaDetalleCompra extends JFrame {
+public class VentanaContiene extends JFrame {
 
-    public VentanaDetalleCompra(int idCompra) {
+    public VentanaContiene(int idCompra) {
         setTitle("Detalle de la Compra #" + idCompra);
         setSize(900, 600);
         setLocationRelativeTo(null);
