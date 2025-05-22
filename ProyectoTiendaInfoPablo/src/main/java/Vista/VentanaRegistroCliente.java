@@ -1,77 +1,68 @@
 package Vista;
 
+import Controlador.ControladorCliente;
 import Modelo.Cliente;
-import Controlador.ControladorPersona;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class VentanaRegistroCliente extends JFrame {
 
-    private JTextField txtNombre, txtEmail, txtTelefono, txtDireccion;
-    private JPasswordField txtContraseña;
-
     public VentanaRegistroCliente() {
         setTitle("Registro de Cliente");
-        setSize(900, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(400, 350);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // 🔙 Botón Volver en la parte superior izquierda
-        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelSuperior.add(new BotonVolver(new VentanaInicio()));
-        add(panelSuperior, BorderLayout.NORTH);
+        JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
 
-        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
+        JTextField txtNombre = new JTextField();
+        JTextField txtEmail = new JTextField();
+        JTextField txtTelefono = new JTextField();
+        JTextField txtDireccion = new JTextField();
+        JPasswordField txtContraseña = new JPasswordField();
 
-        txtNombre = new JTextField();
-        txtEmail = new JTextField();
-        txtTelefono = new JTextField();
-        txtDireccion = new JTextField();
-        txtContraseña = new JPasswordField();
-
-        panel.add(new JLabel("Nombre:"));     panel.add(txtNombre);
-        panel.add(new JLabel("Email:"));      panel.add(txtEmail);
-        panel.add(new JLabel("Teléfono:"));   panel.add(txtTelefono);
-        panel.add(new JLabel("Dirección:"));  panel.add(txtDireccion);
-        panel.add(new JLabel("Contraseña:")); panel.add(txtContraseña);
+        panel.add(new JLabel("Nombre:"));
+        panel.add(txtNombre);
+        panel.add(new JLabel("Email:"));
+        panel.add(txtEmail);
+        panel.add(new JLabel("Teléfono:"));
+        panel.add(txtTelefono);
+        panel.add(new JLabel("Dirección:"));
+        panel.add(txtDireccion);
+        panel.add(new JLabel("Contraseña:"));
+        panel.add(txtContraseña);
 
         JButton btnRegistrar = new JButton("Registrarse");
-        panel.add(btnRegistrar);
 
-        add(panel);
-
-        // Acción del botón
         btnRegistrar.addActionListener(e -> {
-            if (camposVacios()) {
-                JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos.");
+            String nombre = txtNombre.getText().trim();
+            String email = txtEmail.getText().trim();
+            String telefono = txtTelefono.getText().trim();
+            String direccion = txtDireccion.getText().trim();
+            String contraseña = new String(txtContraseña.getPassword()).trim();
+
+            if (contraseña.length() < 6) {
+                JOptionPane.showMessageDialog(this, "La contraseña debe tener al menos 6 caracteres.");
                 return;
             }
 
-            Cliente cliente = new Cliente(
-                    txtNombre.getText().trim(),
-                    txtEmail.getText().trim(),
-                    txtTelefono.getText().trim(),
-                    txtDireccion.getText().trim(),
-                    new String(txtContraseña.getPassword()).trim()
-            );
+            Cliente cliente = new Cliente(nombre, email, telefono, direccion, contraseña);
+            boolean exito = ControladorCliente.registrarCliente(cliente);
 
-            new ControladorPersona().registrarPersona(cliente);
-            JOptionPane.showMessageDialog(this, "¡Cliente registrado con éxito!" +" Recuerde su Id: "+ cliente.getId());
-            volverAlMenuCliente();
+            if (exito) {
+                JOptionPane.showMessageDialog(this, "¡Registro exitoso! Tu ID es: " + cliente.getId());
+                dispose();
+                new VentanaCliente().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "❌ Error al registrar cliente. Revisa los datos.");
+            }
         });
-    }
 
-    private boolean camposVacios() {
-        return txtNombre.getText().trim().isEmpty() ||
-                txtEmail.getText().trim().isEmpty() ||
-                txtTelefono.getText().trim().isEmpty() ||
-                txtDireccion.getText().trim().isEmpty() ||
-                txtContraseña.getPassword().length == 0;
-    }
+        JPanel panelBoton = new JPanel();
+        panelBoton.add(btnRegistrar);
 
-    private void volverAlMenuCliente() {
-        dispose();
-        new VentanaCliente().setVisible(true);
+        add(panel, BorderLayout.CENTER);
+        add(panelBoton, BorderLayout.SOUTH);
     }
 }

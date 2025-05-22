@@ -30,29 +30,7 @@ public class EmpleadoDAO {
         return null;
     }
 
-    public static Empleado buscarEmpleadoPorId(int id) {
-        Connection conn = ConexionBD.conectar();
-        try {
-            String sql = "SELECT p.nombre, p.email, p.telefono, p.direccion " +
-                    "FROM Persona p JOIN Empleado e ON p.id_persona = e.id_persona " +
-                    "WHERE p.id_persona = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return new Empleado(
-                        rs.getString("nombre"),
-                        rs.getString("email"),
-                        rs.getString("telefono"),
-                        rs.getString("direccion"),
-                        "" // contraseña no se devuelve aquí
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 
     public static Empleado obtenerEmpleadoAleatorio() {
         Connection conn = ConexionBD.conectar();
@@ -77,4 +55,38 @@ public class EmpleadoDAO {
         }
         return null;
     }
+    public static Empleado obtenerPorId(int id) {
+        Empleado empleado = null;
+
+        String sql = """
+        SELECT p.nombre, p.email, p.telefono, p.direccion, e.contraseña
+        FROM empleado e
+        JOIN persona p ON e.id_persona = p.id_persona
+        WHERE e.id_persona = ?
+        """;
+
+        try (Connection conn = ConexionBD.conectar();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                empleado = new Empleado(
+                        rs.getString("nombre"),
+                        rs.getString("email"),
+                        rs.getString("telefono"),
+                        rs.getString("direccion"),
+                        rs.getString("contraseña")
+                );
+                empleado.setId(id); // Muy importante: asignar el ID al objeto
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return empleado;
+    }
+
 }

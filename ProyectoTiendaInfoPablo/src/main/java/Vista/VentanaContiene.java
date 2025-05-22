@@ -1,32 +1,39 @@
 package Vista;
 
-import Modelo.CompraDAO;
+import Controlador.ControladorContiene;
+import Modelo.Contiene;
 
 import javax.swing.*;
-import java.util.Map;
+import java.awt.*;
+import java.util.List;
 
 public class VentanaContiene extends JFrame {
 
     public VentanaContiene(int idCompra) {
         setTitle("Detalle de la Compra #" + idCompra);
-        setSize(900, 600);
+        setSize(500, 400);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
         JTextArea area = new JTextArea();
         area.setEditable(false);
 
-        Map<String, Integer> productos = CompraDAO.obtenerProductosPorCompra(idCompra);
+        List<Contiene> productos = ControladorContiene.obtenerPorCompra(idCompra);
 
         if (productos.isEmpty()) {
             area.setText("No hay productos asociados a esta compra.");
         } else {
-            area.append("Productos comprados:\n");
-            for (Map.Entry<String, Integer> entry : productos.entrySet()) {
-                area.append("- " + entry.getKey() + " x" + entry.getValue() + "\n");
+            StringBuilder sb = new StringBuilder("Productos comprados:\n\n");
+            for (Contiene c : productos) {
+                sb.append("- ").append(c.getProducto().getNombre())
+                        .append(" x").append(c.getCantidad())
+                        .append("\n");
             }
+            area.setText(sb.toString());
         }
 
-        add(new JScrollPane(area));
+        JScrollPane scroll = new JScrollPane(area);
+        add(scroll, BorderLayout.CENTER);
     }
 }

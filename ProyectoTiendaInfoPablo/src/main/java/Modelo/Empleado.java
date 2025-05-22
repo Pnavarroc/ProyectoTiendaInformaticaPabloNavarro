@@ -1,36 +1,39 @@
 package Modelo;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 public class Empleado extends Persona {
     private String contraseña;
 
     public Empleado(String nombre, String email, String telefono, String direccion, String contraseña) {
         super(nombre, email, telefono, direccion);
-        this.contraseña=contraseña;
+        this.contraseña = contraseña;
     }
 
-    public Empleado() {
-    }
-
-    public String getContraseña(){
+    public String getContraseña() {
         return contraseña;
+    }
+
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
     }
 
     @Override
     public void guardarEnBD() {
-        try {
-            PersonaDAO.guardarPersona(this); // El ID se asigna vía setId()
+        int nuevoId = PersonaDAO.guardarPersona(this);
+        this.setId(nuevoId);
 
-            Connection conn = ConexionBD.conectar();
-            String sqlEmpleado = "INSERT INTO Empleado (id_persona, contraseña) VALUES (?,?)";
-            PreparedStatement ps = conn.prepareStatement(sqlEmpleado);
-            ps.setInt(1, getId());
-            ps.setString(2,getContraseña());
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (this.getId() > 0) {
+            try (Connection conn = ConexionBD.conectar()) {
+                String sql = "INSERT INTO empleado (id_persona, contraseña) VALUES (?, ?)";
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setInt(1, this.getId());
+                ps.setString(2, this.contraseña);
+                ps.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -1,106 +1,59 @@
 package Vista;
 
-import Modelo.*;
+import Controlador.ControladorCompra;
+import Modelo.Cliente;
+import Modelo.Producto;
+
 import javax.swing.*;
 import java.awt.*;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Map;
 
 public class VentanaCompraCliente extends JFrame {
 
-    private Cliente cliente;
-    private Map<Producto, Integer> carrito = new LinkedHashMap<>();
-    private JPanel panelCarrito;
-    private JLabel lblTotal;
+    private final Cliente cliente;
+    private final Map<Producto, Integer> carrito;
+    private final JPanel panelCarrito;
+    private final JLabel lblTotal;
 
-    public VentanaCompraCliente(Cliente cliente) {
+    public VentanaCompraCliente(Cliente cliente, Map<Producto, Integer> carrito) {
         this.cliente = cliente;
+        this.carrito = carrito;
 
-        setTitle("Compra - " + cliente.getNombre());
-        setSize(1000, 600);
+        setTitle("Tu Carrito de Compra");
+        setSize(900, 600);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
-        // 🔙 Panel superior con botón volver
-        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelSuperior.add(new BotonVolver(new VentanaClienteSesion(cliente)));
-        add(panelSuperior, BorderLayout.NORTH);
-
-        // 🟩 Panel de productos disponibles (izquierda)
-        JPanel panelProductos = new JPanel();
-        panelProductos.setLayout(new BoxLayout(panelProductos, BoxLayout.Y_AXIS));
-        JScrollPane scrollProductos = new JScrollPane(panelProductos);
-        scrollProductos.setBorder(BorderFactory.createTitledBorder("Productos"));
-
-        for (Producto p : ProductoDAO.getTodosLosProductos()) {
-            JPanel card = new JPanel(new BorderLayout());
-            card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-            JTextArea info = new JTextArea(
-                    p.getNombre() + "\n" +
-                            "Marca: " + p.getMarca() + "\n" +
-                            "Precio: " + p.getPrecio() + "€"
-            );
-            info.setEditable(false);
-
-            JButton btnAdd = new JButton("Añadir al carrito");
-            btnAdd.addActionListener(e -> {
-                carrito.put(p, carrito.getOrDefault(p, 0) + 1);
-                actualizarCarrito();
-            });
-
-            card.add(info, BorderLayout.CENTER);
-            card.add(btnAdd, BorderLayout.SOUTH);
-            panelProductos.add(card);
-        }
-
-        add(scrollProductos, BorderLayout.WEST);
-
-        // 🟦 Panel del carrito (derecha)
+        // 🛒 Panel carrito (derecha)
         panelCarrito = new JPanel();
         panelCarrito.setLayout(new BoxLayout(panelCarrito, BoxLayout.Y_AXIS));
         JScrollPane scrollCarrito = new JScrollPane(panelCarrito);
-        scrollCarrito.setBorder(BorderFactory.createTitledBorder("Carrito"));
-        scrollCarrito.setPreferredSize(new Dimension(400, 0));
-        add(scrollCarrito, BorderLayout.EAST);
+        scrollCarrito.setBorder(BorderFactory.createTitledBorder("Productos en tu carrito"));
+        add(scrollCarrito, BorderLayout.CENTER);
 
-        // 🟨 Panel inferior (total + botones)
+        // 🟨 Panel inferior (total + acciones)
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        lblTotal = new JLabel("Total: 0.00€");
+        lblTotal = new JLabel("Total: 0.00 €");
 
-        JButton btnVaciar = new JButton("Vaciar carrito");
+        JButton btnVaciar = new JButton("🧹 Vaciar carrito");
         btnVaciar.addActionListener(e -> {
             carrito.clear();
             actualizarCarrito();
         });
 
-        JButton btnComprar = new JButton("✅ Realizar compra");
+        JButton btnComprar = new JButton("✅ Finalizar compra");
         btnComprar.addActionListener(e -> {
-            if (carrito.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "El carrito está vacío.");
-                return;
-            }
-
-            int confirm = JOptionPane.showConfirmDialog(this, "¿Deseas confirmar la compra?", "Confirmación", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this, "¿Confirmar compra?", "Confirmación", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                try {
-                    double total = calcularTotal();
-                    Empleado emp = EmpleadoDAO.obtenerEmpleadoAleatorio();
-                    if (emp == null) {
-                        JOptionPane.showMessageDialog(this, "No hay empleados disponibles.");
-                        return;
-                    }
-                    Compra compra = new Compra(cliente, emp, total, carrito);
-                    CompraDAO.guardarCompra(compra);
-                    CompraDAO.guardarProductosComprados(compra);
-
-                    JOptionPane.showMessageDialog(this, "¡Compra realizada con éxito!");
+                boolean exito = ControladorCompra.procesarCompra(cliente, carrito);
+                if (exito) {
+                    JOptionPane.showMessageDialog(this, "Compra realizada con éxito.");
                     carrito.clear();
-                    actualizarCarrito();
-
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Error al procesar la compra.");
+                    dispose();
+                    new VentanaClienteSesion(cliente).setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "❌ Error al procesar la compra.");
                 }
             }
         });
@@ -108,6 +61,7 @@ public class VentanaCompraCliente extends JFrame {
         panelInferior.add(lblTotal);
         panelInferior.add(btnVaciar);
         panelInferior.add(btnComprar);
+
         add(panelInferior, BorderLayout.SOUTH);
 
         actualizarCarrito();
@@ -115,6 +69,7 @@ public class VentanaCompraCliente extends JFrame {
 
     private void actualizarCarrito() {
         panelCarrito.removeAll();
+        double total = 0;
 
         for (Producto p : carrito.keySet()) {
             int cantidad = carrito.get(p);
@@ -149,19 +104,13 @@ public class VentanaCompraCliente extends JFrame {
             item.add(btnMenos);
             item.add(btnEliminar);
             panelCarrito.add(item);
+
+            total += p.getPrecio() * cantidad;
         }
 
-        lblTotal.setText("Total: " + String.format("%.2f", calcularTotal()) + "€");
+        lblTotal.setText("Total: " + String.format("%.2f", total) + " €");
 
         panelCarrito.revalidate();
         panelCarrito.repaint();
-    }
-
-    private double calcularTotal() {
-        double total = 0;
-        for (Map.Entry<Producto, Integer> entry : carrito.entrySet()) {
-            total += entry.getKey().getPrecio() * entry.getValue();
-        }
-        return total;
     }
 }

@@ -4,13 +4,24 @@ import Modelo.Persona;
 
 public class ControladorPersona {
 
-    public void registrarPersona(Persona persona) {
+    public static boolean validarDatos(Persona persona) {
+        if (persona.getNombre() == null || persona.getNombre().trim().isEmpty()) return false;
+        if (persona.getEmail() == null || persona.getEmail().trim().isEmpty()) return false;
+        if (persona.getTelefono() == null || persona.getTelefono().trim().isEmpty()) return false;
+        if (persona.getDireccion() == null || persona.getDireccion().trim().isEmpty()) return false;
+
+        return true;
+    }
+
+    public static boolean registrarPersona(Persona persona) {
+        if (!validarDatos(persona)) return false;
+
         try {
             persona.guardarEnBD();
-            System.out.println("Persona registrada con éxito: " + persona.getNombre());
+            return true;
         } catch (Exception e) {
-            System.out.println("Error al registrar persona: " + persona.getNombre());
             e.printStackTrace();
+            return false;
         }
     }
 }

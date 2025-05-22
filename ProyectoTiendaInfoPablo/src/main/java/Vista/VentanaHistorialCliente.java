@@ -1,39 +1,40 @@
 package Vista;
 
-import Modelo.Compra;
-import Modelo.CompraDAO;
 import Modelo.Cliente;
+import Modelo.Compra;
+import Controlador.ControladorCompra;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 
 public class VentanaHistorialCliente extends JFrame {
 
     public VentanaHistorialCliente(Cliente cliente) {
         setTitle("Historial de Compras - " + cliente.getNombre());
-        setSize(900, 600);
+        setSize(600, 400);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        List<Compra> compras = CompraDAO.obtenerComprasPorCliente(cliente.getId());
+        List<Compra> compras = ControladorCompra.obtenerComprasPorCliente(cliente.getId());
 
-        JTextArea area = new JTextArea();
-        area.setEditable(false);
-
-        if (compras.isEmpty()) {
-            area.setText("No hay compras registradas.");
+        if (compras == null || compras.isEmpty()) {
+            panel.add(new JLabel("No hay compras registradas."));
         } else {
-            for (Compra c : compras) {
-                JButton btn = new JButton("Ver detalles de Compra #" + c.getId() + " | Total: " + c.getTotal() + "€");
-                btn.addActionListener(e -> new VentanaContiene(c.getId()).setVisible(true));
+            for (Compra compra : compras) {
+                String texto = "Compra #" + compra.getId() + " | Total: " + compra.getTotal() +
+                        "€ | Atendida por: " + compra.getEmpleado().getNombre();
+
+                JButton btn = new JButton(texto);
+                btn.addActionListener(e -> new VentanaContiene(compra.getId()).setVisible(true));
                 panel.add(btn);
             }
         }
 
-        JScrollPane scroll = new JScrollPane(area);
+        JScrollPane scroll = new JScrollPane(panel);
         add(scroll);
     }
 }

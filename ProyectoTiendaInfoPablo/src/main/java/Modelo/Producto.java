@@ -1,6 +1,8 @@
 package Modelo;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Producto {
     private int id;
@@ -18,11 +20,6 @@ public class Producto {
         this.precio = precio;
     }
 
-    public Producto(String nombre, String marca, double precio) {
-        this.nombre = nombre;
-        this.marca = marca;
-        this.precio = precio;
-    }
 
     // Getters y Setters
     public int getId() {
@@ -49,19 +46,61 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public void setMarca(String marca) {
-        this.marca = marca;
+    public static List<Producto> getTodosLosProductos() {
+        List<Producto> lista = new ArrayList<>();
+
+        String sql = "SELECT * FROM producto ORDER BY nombre";
+
+        try (Connection conn = ConexionBD.conectar();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Producto p = new Producto(
+                        rs.getInt("id_producto"),
+                        rs.getString("nombre"),
+                        rs.getString("marca"),
+                        rs.getDouble("precio")
+                );
+                lista.add(p);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+    public static List<Producto> buscarPorNombre(String texto) {
+        List<Producto> lista = new ArrayList<>();
+
+        String sql = "SELECT * FROM producto WHERE nombre LIKE ?";
+
+        try (Connection conn = ConexionBD.conectar();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + texto + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Producto p = new Producto(
+                        rs.getInt("id_producto"),
+                        rs.getString("nombre"),
+                        rs.getString("marca"),
+                        rs.getDouble("precio")
+                );
+                lista.add(p);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
     }
 
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
 
-    public void mostrarInfo() {
-        System.out.println("ID: " + id);
-        System.out.println("Nombre: " + nombre);
-        System.out.println("Marca: " + marca);
-        System.out.println("Precio: " + precio + "€");
-    }
+
+
 
 }
