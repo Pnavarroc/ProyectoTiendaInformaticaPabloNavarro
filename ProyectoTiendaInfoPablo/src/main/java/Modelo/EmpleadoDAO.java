@@ -16,13 +16,15 @@ public class EmpleadoDAO {
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new Empleado(
+                 Empleado empleado = new Empleado(
                         rs.getString("nombre"),
                         rs.getString("email"),
                         rs.getString("telefono"),
                         rs.getString("direccion"),
                         rs.getString("contraseña")
                 );
+                 empleado.setId(id);
+                 return empleado;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,6 +57,7 @@ public class EmpleadoDAO {
         }
         return null;
     }
+
     public static Empleado obtenerPorId(int id) {
         Empleado empleado = null;
 

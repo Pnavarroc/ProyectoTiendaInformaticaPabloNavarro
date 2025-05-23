@@ -10,8 +10,8 @@ import java.util.List;
 public class VentanaContiene extends JFrame {
 
     public VentanaContiene(int idCompra) {
-        setTitle("Detalle de la Compra #" + idCompra);
-        setSize(500, 400);
+        setTitle("Detalle de la compra #" + idCompra);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());

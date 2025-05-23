@@ -15,6 +15,12 @@ public class Compra {
         this.total = total;
         this.productos = productos;
     }
+    public Compra(Cliente cliente, Empleado empleado, double total) {
+        this.cliente = cliente;
+        this.empleado = empleado;
+        this.total = total;
+    }
+
 
     public int getId() {
         return id;

@@ -1,59 +1,54 @@
 package Vista;
 
 import Controlador.ControladorCliente;
-import Controlador.ControladorProducto;
+import Controlador.ControladorCompra;
 import Modelo.Cliente;
+import Modelo.Compra;
 import Modelo.Producto;
+import Modelo.ProductoDAO;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.SQLException;
+import java.util.*;
 
 public class VentanaClienteSesion extends JFrame {
 
-    private final Cliente cliente;
-    private final Map<Producto, Integer> carrito = new HashMap<>();
+    private Cliente cliente;
+    private Map<Producto, Integer> carrito = new LinkedHashMap<>();
+    private JPanel panelCarrito;
+    private JLabel lblTotal;
 
     public VentanaClienteSesion(Cliente cliente) {
         this.cliente = cliente;
 
         setTitle("Bienvenido, " + cliente.getNombre());
-        setSize(900, 600);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout(10, 10));
 
-        // 🔙 Botón Volver
-        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelSuperior.add(new BotonVolver(new VentanaCliente()));
-        add(panelSuperior, BorderLayout.NORTH);
-
-        // 🟩 Panel de productos
+        // 🧾 Panel productos
         JPanel panelProductos = new JPanel();
-        panelProductos.setLayout(new GridLayout(0, 2, 10, 10));
+        panelProductos.setLayout(new BoxLayout(panelProductos, BoxLayout.Y_AXIS));
+        JScrollPane scrollProductos = new JScrollPane(panelProductos);
+        scrollProductos.setBorder(BorderFactory.createTitledBorder("Catálogo de Productos"));
 
-        List<Producto> productos = ControladorProducto.obtenerTodos();
-
-        for (Producto p : productos) {
+        for (Producto p : ProductoDAO.getTodosLosProductos()) {
             JPanel card = new JPanel(new BorderLayout());
-            card.setBorder(BorderFactory.createTitledBorder(p.getNombre()));
+            card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
-            JTextArea info = new JTextArea("Marca: " + p.getMarca() + "\nPrecio: " + p.getPrecio() + "€");
+            JTextArea info = new JTextArea(
+                    p.getNombre() + "\n" +
+                            "Marca: " + p.getMarca() + "\n" +
+                            "Precio: " + p.getPrecio() + "€"
+            );
             info.setEditable(false);
 
             JButton btnAdd = new JButton("Añadir al carrito");
             btnAdd.addActionListener(e -> {
-                String cantidadStr = JOptionPane.showInputDialog(this, "¿Cuántas unidades de " + p.getNombre() + "?");
-                try {
-                    int cantidad = Integer.parseInt(cantidadStr);
-                    if (cantidad <= 0) return;
-                    carrito.put(p, carrito.getOrDefault(p, 0) + cantidad);
-                    JOptionPane.showMessageDialog(this, "Producto añadido al carrito.");
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Cantidad inválida.");
-                }
+                carrito.put(p, carrito.getOrDefault(p, 0) + 1);
+                actualizarCarrito();
             });
 
             card.add(info, BorderLayout.CENTER);
@@ -61,51 +56,133 @@ public class VentanaClienteSesion extends JFrame {
             panelProductos.add(card);
         }
 
-        JScrollPane scroll = new JScrollPane(panelProductos);
-        add(scroll, BorderLayout.CENTER);
+        add(scrollProductos, BorderLayout.CENTER);
 
-        // 🟦 Botones inferiores
-        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton btnHistorial = new JButton("📜 Ver historial");
-        JButton btnBaja = new JButton("❌ Darse de baja");
-        JButton btnCerrar = new JButton("🔓 Cerrar sesión");
-        JButton btnComprar = new JButton("🛒 Comprar productos");
+        // 🛒 Carrito lateral
+        panelCarrito = new JPanel();
+        panelCarrito.setLayout(new BoxLayout(panelCarrito, BoxLayout.Y_AXIS));
+        JScrollPane scrollCarrito = new JScrollPane(panelCarrito);
+        scrollCarrito.setBorder(BorderFactory.createTitledBorder("Carrito de Compra"));
+        scrollCarrito.setPreferredSize(new Dimension(300, 0));
+        add(scrollCarrito, BorderLayout.EAST);
 
+        // 🔘 Botones inferiores
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        lblTotal = new JLabel("Total: 0.00€");
+
+        JButton btnVaciar = new JButton("🗑️ Vaciar");
+        btnVaciar.addActionListener(e -> {
+            carrito.clear();
+            actualizarCarrito();
+        });
+
+        JButton btnComprar = new JButton("✅ Realizar Compra");
+        btnComprar.addActionListener(e -> procesarCompra());
+
+        JButton btnHistorial = new JButton("📜 Historial");
         btnHistorial.addActionListener(e -> new VentanaHistorialCliente(cliente).setVisible(true));
 
+        JButton btnBaja = new JButton("❌ Darse de baja");
         btnBaja.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(this, "¿Darse de baja?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this, "¿Deseas eliminar tu cuenta?",
+                    "Confirmación", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                boolean eliminado = ControladorCliente.eliminarCliente(cliente.getId());
-                if (eliminado) {
+                if (ControladorCliente.eliminarCliente(cliente.getId())) {
                     JOptionPane.showMessageDialog(this, "Cuenta eliminada.");
                     dispose();
                     new VentanaCliente().setVisible(true);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Error al eliminar cuenta.");
+                    JOptionPane.showMessageDialog(this, "No se pudo eliminar tu cuenta.");
                 }
             }
         });
 
+        JButton btnCerrar = new JButton("🔙 Cerrar sesión");
         btnCerrar.addActionListener(e -> {
             dispose();
             new VentanaCliente().setVisible(true);
         });
 
-        btnComprar.addActionListener(e -> {
-            if (carrito.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "El carrito está vacío.");
-                return;
-            }
-            dispose();
-            new VentanaCompraCliente(cliente, carrito).setVisible(true);
-        });
-
+        panelInferior.add(lblTotal);
+        panelInferior.add(btnVaciar);
+        panelInferior.add(btnComprar);
         panelInferior.add(btnHistorial);
         panelInferior.add(btnBaja);
         panelInferior.add(btnCerrar);
-        panelInferior.add(btnComprar);
 
         add(panelInferior, BorderLayout.SOUTH);
+
+        actualizarCarrito();
+    }
+
+    private void actualizarCarrito() {
+        panelCarrito.removeAll();
+
+        for (Producto p : carrito.keySet()) {
+            int cantidad = carrito.get(p);
+
+            JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JLabel lbl = new JLabel(p.getNombre() + " x" + cantidad);
+
+            JButton btnMas = new JButton("+");
+            btnMas.addActionListener(e -> {
+                carrito.put(p, cantidad + 1);
+                actualizarCarrito();
+            });
+
+            JButton btnMenos = new JButton("-");
+            btnMenos.addActionListener(e -> {
+                if (cantidad > 1) {
+                    carrito.put(p, cantidad - 1);
+                } else {
+                    carrito.remove(p);
+                }
+                actualizarCarrito();
+            });
+
+            JButton btnEliminar = new JButton("❌");
+            btnEliminar.addActionListener(e -> {
+                carrito.remove(p);
+                actualizarCarrito();
+            });
+
+            item.add(lbl);
+            item.add(btnMas);
+            item.add(btnMenos);
+            item.add(btnEliminar);
+            panelCarrito.add(item);
+        }
+
+        lblTotal.setText("Total: " + String.format("%.2f", calcularTotal()) + "€");
+        panelCarrito.revalidate();
+        panelCarrito.repaint();
+    }
+
+    private double calcularTotal() {
+        return carrito.entrySet().stream()
+                .mapToDouble(e -> e.getKey().getPrecio() * e.getValue())
+                .sum();
+    }
+
+    private void procesarCompra() {
+        if (carrito.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El carrito está vacío.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "¿Confirmas la compra por " + String.format("%.2f", calcularTotal()) + "€?",
+                "Confirmación", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean exito = ControladorCompra.procesarCompra(cliente, carrito);
+            if (exito) {
+                JOptionPane.showMessageDialog(this, "¡Compra realizada con éxito!");
+                carrito.clear();
+                actualizarCarrito();
+            } else {
+                JOptionPane.showMessageDialog(this, "Hubo un problema al procesar la compra.");
+            }
+        }
     }
 }

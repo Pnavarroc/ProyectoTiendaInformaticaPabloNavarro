@@ -17,7 +17,7 @@ public class VentanaRegistro extends JFrame {
 
     public VentanaRegistro() {
         setTitle("Registro de Personas");
-        setSize(900, 600);
+        setSize(1100, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

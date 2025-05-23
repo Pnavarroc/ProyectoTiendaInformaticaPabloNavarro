@@ -7,40 +7,46 @@ public class VentanaInicio extends JFrame {
 
     public VentanaInicio() {
         setTitle("Bienvenido a Tienda Informática");
-        setSize(900, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
+        JLabel titulo = new JLabel("Tienda Informática", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        add(titulo, BorderLayout.NORTH);
 
-        JLabel lblTitulo = new JLabel("¿Cómo deseas acceder?", JLabel.CENTER);
-        JButton btnCliente = new JButton("Cliente");
-        JButton btnEmpleado = new JButton("Empleado");
+        // 🔘 Botones principales
+        JButton btnCliente = new JButton("👤 Cliente");
+        JButton btnEmpleado = new JButton("🧑‍💼 Empleado");
 
+        btnCliente.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        btnEmpleado.setFont(new Font("SansSerif", Font.PLAIN, 16));
 
-        panel.add(lblTitulo);
-        panel.add(btnCliente);
-        panel.add(btnEmpleado);
+        JPanel panelCentral = new JPanel(new GridLayout(2, 1, 15, 15));
+        panelCentral.setBorder(BorderFactory.createEmptyBorder(20, 60, 20, 60));
+        panelCentral.add(btnCliente);
+        panelCentral.add(btnEmpleado);
 
+        add(panelCentral, BorderLayout.CENTER);
 
-        add(panel);
-
-        // Acción: acceder como cliente
+        // 🔁 Acciones
         btnCliente.addActionListener(e -> {
+            dispose();
             new VentanaCliente().setVisible(true);
-            dispose();
         });
 
-        // Acción: acceder como empleado
         btnEmpleado.addActionListener(e -> {
-            new Vista.VentanaEmpleado().setVisible(true);
             dispose();
+            new VentanaLoginEmpleado().setVisible(true);
         });
-
-       
     }
 
+    // ✅ Punto de entrada del programa
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new VentanaInicio().setVisible(true));
+        SwingUtilities.invokeLater(() -> {
+            new VentanaInicio().setVisible(true);
+        });
     }
 }

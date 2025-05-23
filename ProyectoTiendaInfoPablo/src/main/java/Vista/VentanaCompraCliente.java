@@ -20,7 +20,7 @@ public class VentanaCompraCliente extends JFrame {
         this.carrito = carrito;
 
         setTitle("Tu Carrito de Compra");
-        setSize(900, 600);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));

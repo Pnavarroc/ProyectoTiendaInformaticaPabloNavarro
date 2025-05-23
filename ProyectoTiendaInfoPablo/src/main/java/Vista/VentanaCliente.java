@@ -7,34 +7,51 @@ public class VentanaCliente extends JFrame {
 
     public VentanaCliente() {
         setTitle("Área Cliente");
-        setSize(900, 600);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // 🔙 Botón Volver en la parte superior izquierda
-        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelSuperior.add(new BotonVolver(new VentanaInicio()));
-        add(panelSuperior, BorderLayout.NORTH);
+        JLabel titulo = new JLabel("Acceso Cliente", SwingConstants.CENTER);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 20));
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        add(titulo, BorderLayout.NORTH);
 
-        // ▶️ Contenido principal centrado
-        JPanel centro = new JPanel(new GridLayout(2, 1, 10, 10));
-        JButton btnIniciar = new JButton("Iniciar sesión");
-        JButton btnRegistrar = new JButton("Registrarse");
+        // 🔘 Botones de acción
+        JButton btnRegistro = new JButton("📝 Registrarse");
+        JButton btnLogin = new JButton("🔓 Iniciar sesión");
+        JButton btnVolver = new JButton("🔙 Volver");
 
-        btnIniciar.addActionListener(e -> {
-            dispose();
-            new VentanaLoginCliente().setVisible(true);
-        });
+        btnRegistro.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        btnLogin.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        btnVolver.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-        btnRegistrar.addActionListener(e -> {
+        JPanel panelCentral = new JPanel(new GridLayout(2, 1, 15, 15));
+        panelCentral.setBorder(BorderFactory.createEmptyBorder(10, 60, 10, 60));
+        panelCentral.add(btnRegistro);
+        panelCentral.add(btnLogin);
+
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelInferior.add(btnVolver);
+
+        add(panelCentral, BorderLayout.CENTER);
+        add(panelInferior, BorderLayout.SOUTH);
+
+        // 🔁 Acciones
+        btnRegistro.addActionListener(e -> {
             dispose();
             new VentanaRegistroCliente().setVisible(true);
         });
 
-        centro.add(btnIniciar);
-        centro.add(btnRegistrar);
-        add(centro, BorderLayout.CENTER);
+        btnLogin.addActionListener(e -> {
+            dispose();
+            new VentanaLoginCliente().setVisible(true);
+        });
+
+        btnVolver.addActionListener(e -> {
+            dispose();
+            new VentanaInicio().setVisible(true);
+        });
     }
 }
 

@@ -26,6 +26,8 @@ public class CompraDAO {
 
         ps.close();
         conn.close();
+
+
     }
 
     public static void guardarProductosComprados(Compra compra) throws SQLException {
@@ -147,5 +149,48 @@ public class CompraDAO {
 
         return compras;
     }
+
+    public static List<Compra> obtenerComprasPorEmpleado(int idEmpleado) {
+        List<Compra> lista = new ArrayList<>();
+
+        String sql = """
+            SELECT c.id_compra, c.total, c.id_cliente
+            FROM compra c
+            WHERE c.id_empleado = ?
+            ORDER BY c.id_compra DESC
+        """;
+
+        try (Connection conn = ConexionBD.conectar();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idEmpleado);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int idCompra = rs.getInt("id_compra");
+                double total = rs.getDouble("total");
+                int idCliente = rs.getInt("id_cliente");
+                Cliente cliente = null;
+
+                // 💡 Solo buscar cliente si no es NULL
+                if (!rs.wasNull()) {
+                    cliente = ClienteDAO.obtenerPorId(idCliente);
+                }
+
+                // Obtener también el empleado completo
+                Empleado empleado = EmpleadoDAO.obtenerPorId(idEmpleado);
+
+                Compra compra = new Compra(cliente, empleado, total);
+                compra.setId(idCompra);
+                lista.add(compra);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
 
 }

@@ -7,51 +7,41 @@ import java.awt.*;
 
 public class VentanaEmpleadoMenu extends JFrame {
 
-    private Empleado empleado;
 
     public VentanaEmpleadoMenu(Empleado empleado) {
-        this.empleado = empleado;
-
         setTitle("Panel de Empleado");
-        setSize(900, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout(10, 10));
 
-        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
+        // 🧾 Información del empleado
+        JPanel panelInfo = new JPanel(new GridLayout(5, 1, 5, 5));
+        panelInfo.setBorder(BorderFactory.createTitledBorder("Datos del Empleado"));
 
-        JLabel lblBienvenida = new JLabel("Bienvenido, " + empleado.getNombre(), JLabel.CENTER);
-        JButton btnVerDatos = new JButton("Ver mis datos");
-        JButton btnCerrarSesion = new JButton("Cerrar sesión");
-        JButton btnInforme = new JButton("Clientes Atendidos");
+        panelInfo.add(new JLabel("🧑 Nombre: " + empleado.getNombre()));
+        panelInfo.add(new JLabel("📧 Email: " + empleado.getEmail()));
+        panelInfo.add(new JLabel("📞 Teléfono: " + empleado.getTelefono()));
+        panelInfo.add(new JLabel("🏠 Dirección: " + empleado.getDireccion()));
 
-        panel.add(lblBienvenida);
-        panel.add(btnVerDatos);
-        panel.add(btnCerrarSesion);
+        add(panelInfo, BorderLayout.CENTER);
 
-        add(panel);
+        // 🔘 Botones de acción
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
 
+        JButton btnHistorial = new JButton("📋 Historial de ventas");
+        JButton btnCerrarSesion = new JButton("🔙 Cerrar sesión");
 
-        btnInforme.addActionListener(e -> {
-            new VentanaInformeEmpleado(empleado).setVisible(true);
+        panelBotones.add(btnHistorial);
+        panelBotones.add(btnCerrarSesion);
+
+        add(panelBotones, BorderLayout.SOUTH);
+
+        // 🔁 Acciones
+        btnHistorial.addActionListener(e -> {
+            new VentanaHistorialEmpleado(empleado).setVisible(true);
         });
 
-        panel.add(btnInforme);
-
-        // Mostrar información personal
-        btnVerDatos.addActionListener(e -> {
-            String info = String.format("""
-                    ID: %d
-                    Nombre: %s
-                    Email: %s
-                    Teléfono: %s
-                    Dirección: %s
-                    """, empleado.getId(), empleado.getNombre(), empleado.getEmail(),
-                    empleado.getTelefono(), empleado.getDireccion());
-
-            JOptionPane.showMessageDialog(this, info, "Información del Empleado", JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        // Volver al inicio
         btnCerrarSesion.addActionListener(e -> {
             dispose();
             new VentanaInicio().setVisible(true);

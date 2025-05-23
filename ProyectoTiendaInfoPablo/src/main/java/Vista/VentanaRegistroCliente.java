@@ -8,61 +8,68 @@ import java.awt.*;
 
 public class VentanaRegistroCliente extends JFrame {
 
+    private JTextField txtNombre, txtEmail, txtTelefono, txtDireccion;
+    private JPasswordField txtContraseña;
+
     public VentanaRegistroCliente() {
         setTitle("Registro de Cliente");
-        setSize(400, 350);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
+        // 🔷 Panel de formulario
+        JPanel panelFormulario = new JPanel(new GridLayout(6, 2, 10, 10));
+        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        JTextField txtNombre = new JTextField();
-        JTextField txtEmail = new JTextField();
-        JTextField txtTelefono = new JTextField();
-        JTextField txtDireccion = new JTextField();
-        JPasswordField txtContraseña = new JPasswordField();
+        txtNombre = new JTextField();
+        txtEmail = new JTextField();
+        txtTelefono = new JTextField();
+        txtDireccion = new JTextField();
+        txtContraseña = new JPasswordField();
 
-        panel.add(new JLabel("Nombre:"));
-        panel.add(txtNombre);
-        panel.add(new JLabel("Email:"));
-        panel.add(txtEmail);
-        panel.add(new JLabel("Teléfono:"));
-        panel.add(txtTelefono);
-        panel.add(new JLabel("Dirección:"));
-        panel.add(txtDireccion);
-        panel.add(new JLabel("Contraseña:"));
-        panel.add(txtContraseña);
+        panelFormulario.add(new JLabel("Nombre:"));
+        panelFormulario.add(txtNombre);
+        panelFormulario.add(new JLabel("Email:"));
+        panelFormulario.add(txtEmail);
+        panelFormulario.add(new JLabel("Teléfono:"));
+        panelFormulario.add(txtTelefono);
+        panelFormulario.add(new JLabel("Dirección:"));
+        panelFormulario.add(txtDireccion);
+        panelFormulario.add(new JLabel("Contraseña:"));
+        panelFormulario.add(txtContraseña);
 
-        JButton btnRegistrar = new JButton("Registrarse");
+        JButton btnRegistrar = new JButton("✅ Registrar");
+        JButton btnCancelar = new JButton("❌ Cancelar");
 
-        btnRegistrar.addActionListener(e -> {
-            String nombre = txtNombre.getText().trim();
-            String email = txtEmail.getText().trim();
-            String telefono = txtTelefono.getText().trim();
-            String direccion = txtDireccion.getText().trim();
-            String contraseña = new String(txtContraseña.getPassword()).trim();
+        panelFormulario.add(btnCancelar);
+        panelFormulario.add(btnRegistrar);
 
-            if (contraseña.length() < 6) {
-                JOptionPane.showMessageDialog(this, "La contraseña debe tener al menos 6 caracteres.");
-                return;
-            }
+        add(panelFormulario, BorderLayout.CENTER);
 
-            Cliente cliente = new Cliente(nombre, email, telefono, direccion, contraseña);
-            boolean exito = ControladorCliente.registrarCliente(cliente);
-
-            if (exito) {
-                JOptionPane.showMessageDialog(this, "¡Registro exitoso! Tu ID es: " + cliente.getId());
-                dispose();
-                new VentanaCliente().setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(this, "❌ Error al registrar cliente. Revisa los datos.");
-            }
+        // 🔘 Acciones
+        btnRegistrar.addActionListener(e -> registrarCliente());
+        btnCancelar.addActionListener(e -> {
+            dispose();
+            new VentanaCliente().setVisible(true);
         });
+    }
 
-        JPanel panelBoton = new JPanel();
-        panelBoton.add(btnRegistrar);
+    private void registrarCliente() {
+        String nombre = txtNombre.getText().trim();
+        String email = txtEmail.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+        String direccion = txtDireccion.getText().trim();
+        String contraseña = new String(txtContraseña.getPassword());
 
-        add(panel, BorderLayout.CENTER);
-        add(panelBoton, BorderLayout.SOUTH);
+        Cliente nuevo = new Cliente(nombre, email, telefono, direccion, contraseña);
+
+        if (ControladorCliente.validarCliente(nuevo)) {
+            nuevo.guardarEnBD();
+            JOptionPane.showMessageDialog(this, "¡Registro exitoso! Tu ID es: " + nuevo.getId(),
+                    "Registro completado", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+            new VentanaCliente().setVisible(true);
+        }
     }
 }
