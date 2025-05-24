@@ -1,5 +1,6 @@
 package Vista;
 
+import Controlador.ControladorEmpleado;
 import Modelo.Empleado;
 import Modelo.EmpleadoDAO;
 
@@ -57,7 +58,7 @@ public class VentanaLoginEmpleado extends JFrame {
 
         try {
             int id = Integer.parseInt(idTexto);
-            Empleado empleado = EmpleadoDAO.iniciarSesion(id, contraseña);
+            Empleado empleado = ControladorEmpleado.iniciarSesion(id, contraseña);
 
             if (empleado != null) {
                 JOptionPane.showMessageDialog(this, "Bienvenido, " + empleado.getNombre());

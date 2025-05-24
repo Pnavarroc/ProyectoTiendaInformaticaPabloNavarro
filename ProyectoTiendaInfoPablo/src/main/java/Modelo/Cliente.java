@@ -22,7 +22,7 @@ public class Cliente extends Persona {
     @Override
     public void guardarEnBD() {
         int nuevoId = PersonaDAO.guardarPersona(this);
-        this.setId(nuevoId); // ✅ asigna el ID generado correctamente
+        this.setId(nuevoId); // asigna el ID generado correctamente
 
         if (this.getId() > 0) {
             try (Connection conn = ConexionBD.conectar()) {

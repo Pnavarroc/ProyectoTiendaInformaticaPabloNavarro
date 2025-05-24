@@ -6,7 +6,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DAO (Data Access Object) para la entidad Compra.
+ * Gestiona operaciones de inserción y recuperación de compras, así como su relación con productos.
+ */
+
 public class CompraDAO {
+
+    /**
+     * Guarda una nueva compra en la base de datos y asigna el ID generado a la compra.
+     */
 
     public static void guardarCompra(Compra compra) throws SQLException {
         Connection conn = ConexionBD.conectar();
@@ -30,20 +39,31 @@ public class CompraDAO {
 
     }
 
+
+    /**
+     * Guarda en la base de datos los productos comprados durante una compra,
+     * es decir, rellena la tabla intermedia `contiene` que representa la relación N:M
+     * entre `compra` y `producto`.
+     *
+     * Cada fila insertada indica qué producto se compró, cuántas unidades y en qué compra.
+     * La fecha se inserta automáticamente con NOW().
+     */
     public static void guardarProductosComprados(Compra compra) throws SQLException {
         Connection conn = ConexionBD.conectar();
 
         String sqlDetalle = "INSERT INTO contiene (id_compra, id_producto, cantidad) VALUES (?, ?, ?)";
         PreparedStatement ps = conn.prepareStatement(sqlDetalle);
 
+        // Recorremos todos los productos del carrito
         for (Map.Entry<Producto, Integer> entry : compra.getProductos().entrySet()) {
-            Producto p = entry.getKey();
-            int cantidad = entry.getValue();
+            Producto producto = entry.getKey();      // El producto comprado
+            int cantidad = entry.getValue();         // Cuántas unidades se compraron
 
-            ps.setInt(1, compra.getId());
-            ps.setInt(2, p.getId());
-            ps.setInt(3, cantidad);
-            ps.addBatch(); // Recomendado para eficiencia
+            ps.setInt(1, compra.getId());            // ID de la compra realizada
+            ps.setInt(2, producto.getId());          // ID del producto comprado
+            ps.setInt(3, cantidad);                  // Cantidad de ese producto
+
+            ps.addBatch(); // Añade esta inserción al lote
         }
 
         ps.executeBatch();
@@ -51,66 +71,12 @@ public class CompraDAO {
         conn.close();
     }
 
-    public static Map<String, Double> obtenerClientesAtendidos(int idEmpleado) {
-        Map<String, Double> resultados = new LinkedHashMap<>();
 
-        String sql = """
-        SELECT p.nombre, SUM(c.total) AS total_gastado
-        FROM compra c
-        JOIN cliente cli ON c.id_cliente = cli.id_persona
-        JOIN persona p ON cli.id_persona = p.id_persona
-        WHERE c.id_empleado = ?
-        GROUP BY p.nombre
-        ORDER BY total_gastado DESC
-        """;
 
-        try (Connection conn = ConexionBD.conectar();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, idEmpleado);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String nombreCliente = rs.getString("nombre");
-                double totalGastado = rs.getDouble("total_gastado");
-                resultados.put(nombreCliente, totalGastado);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return resultados;
-    }
-
-    public static Map<String, Integer> obtenerProductosPorCompra(int idCompra) {
-        Map<String, Integer> productos = new LinkedHashMap<>();
-
-        String sql = """
-        SELECT p.nombre, c.cantidad
-        FROM contiene c
-        JOIN producto p ON c.id_producto = p.id_producto
-        WHERE c.id_compra = ?
-        """;
-
-        try (Connection conn = ConexionBD.conectar();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, idCompra);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String nombreProducto = rs.getString("nombre");
-                int cantidad = rs.getInt("cantidad");
-                productos.put(nombreProducto, cantidad);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return productos;
-    }
+    /**
+     * Devuelve todas las compras realizadas por un cliente.
+     * Útil para mostrar historial de compras.
+     */
 
     public static List<Compra> obtenerComprasPorCliente(int idCliente) {
         List<Compra> compras = new ArrayList<>();
@@ -150,6 +116,12 @@ public class CompraDAO {
         return compras;
     }
 
+
+    /**
+     * Devuelve todas las compras gestionadas por un empleado.
+     * Se usa en los informes de actividad del empleado.
+     *
+     */
     public static List<Compra> obtenerComprasPorEmpleado(int idEmpleado) {
         List<Compra> lista = new ArrayList<>();
 

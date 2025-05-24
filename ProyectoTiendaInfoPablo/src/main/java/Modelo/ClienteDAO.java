@@ -4,7 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+/**
+ * DAO (Data Access Object) para la entidad Cliente.
+ * Se encarga de realizar operaciones CRUD sobre la tabla 'cliente' y su relación con 'persona'.
+ */
+
 public class ClienteDAO {
+
+    /**
+     * Realiza el inicio de sesión de un cliente comprobando ID y contraseña.
+     */
 
     public static Cliente iniciarSesion(int id, String contraseña) {
         Cliente cliente = null;
@@ -40,6 +49,12 @@ public class ClienteDAO {
 
         return cliente;
     }
+
+    /**
+     * Elimina un cliente de la base de datos.
+     * También elimina su entrada en 'persona' gracias a la relación con clave foránea.
+     */
+
     public static boolean eliminarCliente(int id) {
         String sqlCliente = "DELETE FROM cliente WHERE id_persona = ?";
         String sqlPersona = "DELETE FROM persona WHERE id_persona = ?";
@@ -70,6 +85,12 @@ public class ClienteDAO {
             return false;
         }
     }
+
+    /**
+     * Recupera un cliente a partir de su ID.
+     * Útil para reconstruir un cliente desde compras pasadas.
+     */
+
     public static Cliente obtenerPorId(int id) {
         Cliente cliente = null;
 

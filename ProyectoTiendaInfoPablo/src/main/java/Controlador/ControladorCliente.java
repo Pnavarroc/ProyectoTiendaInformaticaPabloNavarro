@@ -6,22 +6,11 @@ import Modelo.ClienteDAO;
 import javax.swing.*;
 import java.util.regex.Pattern;
 
+/**
+ * Controlador que gestiona la lógica relacionada con los clientes.
+ * Incluye validación de datos, registro y eliminación.
+ */
 public class ControladorCliente {
-
-    public static boolean registrarCliente(Cliente cliente) {
-        // Lógica de negocio → validaciones
-        if (cliente.getEmail().isEmpty() || cliente.getNombre().isEmpty()) return false;
-        if (cliente.getContraseña().length() < 6) return false;
-
-        try {
-            cliente.guardarEnBD(); // Esto llama internamente a DAO
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
 
     public static Cliente iniciarSesion(int id, String contraseña) {
         return ClienteDAO.iniciarSesion(id, contraseña);
@@ -31,7 +20,11 @@ public class ControladorCliente {
         return ClienteDAO.eliminarCliente(id);
     }
 
-
+    /**
+     * Valida todos los campos de un cliente antes de registrarlo.
+     * Comprueba nombre, email, teléfono, dirección y contraseña.
+     * Muestra mensajes de error si algún dato no es válido.
+     */
     public static boolean validarCliente(Cliente cliente) {
         String nombre = cliente.getNombre();
         String email = cliente.getEmail();

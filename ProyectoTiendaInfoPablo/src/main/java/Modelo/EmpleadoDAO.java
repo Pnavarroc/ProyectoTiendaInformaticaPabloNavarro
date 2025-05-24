@@ -2,8 +2,15 @@ package Modelo;
 
 import java.sql.*;
 
+/**
+ * DAO (Data Access Object) para la entidad Empleado.
+ * Gestiona operaciones como inicio de sesión, búsqueda por ID y selección aleatoria.
+ */
+
 public class EmpleadoDAO {
 
+
+    //Inicia sesión validando las credenciales del empleado.
     public static Empleado iniciarSesion(int id, String contraseña) {
         Connection conn = ConexionBD.conectar();
         try {
@@ -33,7 +40,10 @@ public class EmpleadoDAO {
     }
 
 
-
+    /**
+     * Devuelve un empleado aleatorio de la base de datos.
+     * Utilizado para asignar un empleado automáticamente a una compra.
+     */
     public static Empleado obtenerEmpleadoAleatorio() {
         Connection conn = ConexionBD.conectar();
         try {
@@ -57,7 +67,7 @@ public class EmpleadoDAO {
         }
         return null;
     }
-
+    //Recupera un empleado por su ID (para informes, historial, etc.).
     public static Empleado obtenerPorId(int id) {
         Empleado empleado = null;
 

@@ -6,9 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * DAO (Data Access Object) para la entidad Producto.
+ * Gestiona las operaciones de lectura sobre la tabla 'producto'.
+ */
 public class ProductoDAO {
-
+    /**
+     * Devuelve todos los productos disponibles en la base de datos.
+     * Se usa para mostrar el catálogo completo en la vista del cliente.
+     */
     public static List<Producto> getTodosLosProductos() {
         List<Producto> lista = new ArrayList<>();
         Connection conn = ConexionBD.conectar();
@@ -35,6 +41,10 @@ public class ProductoDAO {
 
         return lista;
     }
+    /**
+     * Busca productos cuyo nombre contenga un texto determinado (búsqueda parcial).
+     * Usado en el buscador de la interfaz cliente.
+     */
     public static List<Producto> buscarPorNombre(String texto) {
         List<Producto> productos = new ArrayList<>();
 

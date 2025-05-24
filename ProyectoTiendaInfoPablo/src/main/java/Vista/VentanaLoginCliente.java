@@ -1,5 +1,6 @@
 package Vista;
 
+import Controlador.ControladorCliente;
 import Modelo.Cliente;
 import Modelo.ClienteDAO;
 
@@ -58,15 +59,16 @@ public class VentanaLoginCliente extends JFrame {
 
         try {
             int id = Integer.parseInt(idTexto);
-            Cliente cliente = ClienteDAO.iniciarSesion(id, contraseña);
+
+
+            Cliente cliente = ControladorCliente.iniciarSesion(id, contraseña);
 
             if (cliente != null) {
-                JOptionPane.showMessageDialog(this, "Bienvenido, " + cliente.getNombre() + "!");
+                JOptionPane.showMessageDialog(this, "Bienvenido, " + cliente.getNombre());
                 dispose();
                 new VentanaClienteSesion(cliente).setVisible(true);
             } else {
-                JOptionPane.showMessageDialog(this, "ID o contraseña incorrectos.",
-                        "Login fallido", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "ID o contraseña incorrectos.", "Login fallido", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (NumberFormatException ex) {

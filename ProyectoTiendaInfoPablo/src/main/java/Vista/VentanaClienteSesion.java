@@ -2,71 +2,70 @@ package Vista;
 
 import Controlador.ControladorCliente;
 import Controlador.ControladorCompra;
+import Controlador.ControladorProducto;
 import Modelo.Cliente;
-import Modelo.Compra;
 import Modelo.Producto;
-import Modelo.ProductoDAO;
+
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
 
 public class VentanaClienteSesion extends JFrame {
 
     private Cliente cliente;
     private Map<Producto, Integer> carrito = new LinkedHashMap<>();
+    private List<Producto> todosLosProductos;
+
     private JPanel panelCarrito;
+    private JPanel panelProductos;
     private JLabel lblTotal;
+    private JTextField txtBuscar;
 
     public VentanaClienteSesion(Cliente cliente) {
         this.cliente = cliente;
+        this.todosLosProductos = ControladorProducto.obtenerTodos();
 
         setTitle("Bienvenido, " + cliente.getNombre());
-        setSize(1100, 600);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
+        // 🔍 Panel superior de búsqueda
+        JPanel panelSuperior = new JPanel(new BorderLayout(5, 5));
+        panelSuperior.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        txtBuscar = new JTextField();
+        JButton btnBuscar = new JButton("Buscar");
+
+        panelSuperior.add(new JLabel("🔍 Buscar producto:"), BorderLayout.WEST);
+        panelSuperior.add(txtBuscar, BorderLayout.CENTER);
+        panelSuperior.add(btnBuscar, BorderLayout.EAST);
+        add(panelSuperior, BorderLayout.NORTH);
+
+        btnBuscar.addActionListener(e -> {
+            String texto = txtBuscar.getText().trim();
+            todosLosProductos = ControladorProducto.buscarPorNombre(texto);
+            mostrarProductosFiltrados("");
+        });
+
         // 🧾 Panel productos
-        JPanel panelProductos = new JPanel();
+        panelProductos = new JPanel();
         panelProductos.setLayout(new BoxLayout(panelProductos, BoxLayout.Y_AXIS));
         JScrollPane scrollProductos = new JScrollPane(panelProductos);
         scrollProductos.setBorder(BorderFactory.createTitledBorder("Catálogo de Productos"));
-
-        for (Producto p : ProductoDAO.getTodosLosProductos()) {
-            JPanel card = new JPanel(new BorderLayout());
-            card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-
-            JTextArea info = new JTextArea(
-                    p.getNombre() + "\n" +
-                            "Marca: " + p.getMarca() + "\n" +
-                            "Precio: " + p.getPrecio() + "€"
-            );
-            info.setEditable(false);
-
-            JButton btnAdd = new JButton("Añadir al carrito");
-            btnAdd.addActionListener(e -> {
-                carrito.put(p, carrito.getOrDefault(p, 0) + 1);
-                actualizarCarrito();
-            });
-
-            card.add(info, BorderLayout.CENTER);
-            card.add(btnAdd, BorderLayout.SOUTH);
-            panelProductos.add(card);
-        }
-
         add(scrollProductos, BorderLayout.CENTER);
 
-        // 🛒 Carrito lateral
+        // 🛒 Panel carrito
         panelCarrito = new JPanel();
         panelCarrito.setLayout(new BoxLayout(panelCarrito, BoxLayout.Y_AXIS));
         JScrollPane scrollCarrito = new JScrollPane(panelCarrito);
-        scrollCarrito.setBorder(BorderFactory.createTitledBorder("Carrito de Compra"));
+        scrollCarrito.setBorder(BorderFactory.createTitledBorder("Carrito"));
         scrollCarrito.setPreferredSize(new Dimension(300, 0));
         add(scrollCarrito, BorderLayout.EAST);
 
-        // 🔘 Botones inferiores
+        // 🔘 Panel inferior
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         lblTotal = new JLabel("Total: 0.00€");
 
@@ -76,7 +75,7 @@ public class VentanaClienteSesion extends JFrame {
             actualizarCarrito();
         });
 
-        JButton btnComprar = new JButton("✅ Realizar Compra");
+        JButton btnComprar = new JButton("✅ Comprar");
         btnComprar.addActionListener(e -> procesarCompra());
 
         JButton btnHistorial = new JButton("📜 Historial");
@@ -112,7 +111,40 @@ public class VentanaClienteSesion extends JFrame {
 
         add(panelInferior, BorderLayout.SOUTH);
 
+        mostrarProductosFiltrados(""); // mostrar todos al inicio
         actualizarCarrito();
+    }
+
+    private void mostrarProductosFiltrados(String texto) {
+        panelProductos.removeAll();
+        texto = texto.toLowerCase();
+
+        for (Producto p : todosLosProductos) {
+            if (p.getNombre().toLowerCase().contains(texto)) {
+                JPanel card = new JPanel(new BorderLayout());
+                card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+                JTextArea info = new JTextArea(
+                        p.getNombre() + "\n" +
+                                "Marca: " + p.getMarca() + "\n" +
+                                "Precio: " + p.getPrecio() + "€"
+                );
+                info.setEditable(false);
+
+                JButton btnAdd = new JButton("Añadir al carrito");
+                btnAdd.addActionListener(e -> {
+                    carrito.put(p, carrito.getOrDefault(p, 0) + 1);
+                    actualizarCarrito();
+                });
+
+                card.add(info, BorderLayout.CENTER);
+                card.add(btnAdd, BorderLayout.SOUTH);
+                panelProductos.add(card);
+            }
+        }
+
+        panelProductos.revalidate();
+        panelProductos.repaint();
     }
 
     private void actualizarCarrito() {
