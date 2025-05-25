@@ -36,7 +36,7 @@ CREATE TABLE `cliente` (
 
 LOCK TABLES `cliente` WRITE;
 /*!40000 ALTER TABLE `cliente` DISABLE KEYS */;
-INSERT INTO `cliente` VALUES (4,'1234'),(5,'1234'),(6,'1234'),(7,'1234');
+INSERT INTO `cliente` VALUES (4,'1234'),(5,'1234'),(6,'1234'),(8,'PabloPrueba1'),(9,'PabloContraeña1'),(11,'Prueba1234'),(12,'Prueba1234'),(13,'Prueba1234');
 /*!40000 ALTER TABLE `cliente` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -49,15 +49,15 @@ DROP TABLE IF EXISTS `compra`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `compra` (
   `id_compra` int NOT NULL AUTO_INCREMENT,
-  `id_cliente` int NOT NULL,
+  `id_cliente` int DEFAULT NULL,
   `id_empleado` int NOT NULL,
   `total` decimal(10,2) NOT NULL,
   PRIMARY KEY (`id_compra`),
-  KEY `id_cliente` (`id_cliente`),
   KEY `id_empleado` (`id_empleado`),
-  CONSTRAINT `compra_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_persona`),
+  KEY `compra_ibfk_1` (`id_cliente`),
+  CONSTRAINT `compra_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_persona`) ON DELETE SET NULL,
   CONSTRAINT `compra_ibfk_2` FOREIGN KEY (`id_empleado`) REFERENCES `empleado` (`id_persona`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -66,6 +66,7 @@ CREATE TABLE `compra` (
 
 LOCK TABLES `compra` WRITE;
 /*!40000 ALTER TABLE `compra` DISABLE KEYS */;
+INSERT INTO `compra` VALUES (11,4,1,44.98),(12,4,3,249.99),(13,4,2,349.99),(14,4,2,89.99),(15,4,3,1449.95),(16,8,1,249.99),(17,NULL,3,249.99),(18,11,1,99.99),(19,13,3,399.96);
 /*!40000 ALTER TABLE `compra` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -79,7 +80,8 @@ DROP TABLE IF EXISTS `contiene`;
 CREATE TABLE `contiene` (
   `id_compra` int NOT NULL,
   `id_producto` int NOT NULL,
-  `fecha` date NOT NULL,
+  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `cantidad` int DEFAULT NULL,
   PRIMARY KEY (`id_compra`,`id_producto`),
   KEY `id_producto` (`id_producto`),
   CONSTRAINT `contiene_ibfk_1` FOREIGN KEY (`id_compra`) REFERENCES `compra` (`id_compra`),
@@ -93,6 +95,7 @@ CREATE TABLE `contiene` (
 
 LOCK TABLES `contiene` WRITE;
 /*!40000 ALTER TABLE `contiene` DISABLE KEYS */;
+INSERT INTO `contiene` VALUES (13,30,'2025-05-22 18:04:14',1),(14,38,'2025-05-22 18:05:04',1),(15,32,'2025-05-23 11:22:44',1),(15,35,'2025-05-23 11:22:44',4),(16,32,'2025-05-23 19:27:33',1),(17,3,'2025-05-24 16:33:25',1),(18,39,'2025-05-24 18:30:54',1),(19,1,'2025-05-24 20:35:50',1),(19,2,'2025-05-24 20:35:50',1),(19,4,'2025-05-24 20:35:50',1),(19,16,'2025-05-24 20:35:50',1);
 /*!40000 ALTER TABLE `contiene` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -137,7 +140,7 @@ CREATE TABLE `persona` (
   `direccion` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`id_persona`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -146,7 +149,7 @@ CREATE TABLE `persona` (
 
 LOCK TABLES `persona` WRITE;
 /*!40000 ALTER TABLE `persona` DISABLE KEYS */;
-INSERT INTO `persona` VALUES (1,'Laura Pérez','laura@tienda.com','111222333','Calle Sol 10'),(2,'Carlos Gómez','carlos@tienda.com','444555666','Av. Luna 45'),(3,'María Ruiz','maria@tienda.com','777888999','Calle Estrella 12'),(4,'Pablo','pnavarroc@iesch.org','653843495','Avenida Sanz Gadea'),(5,'Saul','saul@gmail.com','678231680','Calle los Ojos 5'),(6,'Javier','javier@gmail.com','657889909','jsahdsad'),(7,'afdsg','adfgdfgad','gadfgf','adfadgadfg');
+INSERT INTO `persona` VALUES (1,'Laura Pérez','laura@tienda.com','111222333','Calle Sol 10'),(2,'Carlos Gómez','carlos@tienda.com','444555666','Av. Luna 45'),(3,'María Ruiz','maria@tienda.com','777888999','Calle Estrella 12'),(4,'Pablo','pnavarroc@iesch.org','653843495','Avenida Sanz Gadea'),(5,'Saul','saul@gmail.com','678231680','Calle los Ojos 5'),(6,'Javier','javier@gmail.com','657889909','jsahdsad'),(8,'asd','asd@gmail.com','666666666','asdasd'),(9,'PabloNavarroPrueba','Pablo@gmail.com','789676534','Avenida Sagunto'),(11,'holaPrueba','prueba@gmail.com','567889987','Avenida'),(12,'Prueba12','Prueba12@gmail.com','789887766','juhvas'),(13,'asd','cliente@gmail.com','123456789','sadasd');
 /*!40000 ALTER TABLE `persona` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -185,4 +188,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-20 17:19:58
+-- Dump completed on 2025-05-25 13:26:12
